@@ -29,3 +29,6 @@ restart:
 
 prune:
 	docker system prune -af --volumes
+
+link:
+	golangci-lint run --config .golangci.yml
