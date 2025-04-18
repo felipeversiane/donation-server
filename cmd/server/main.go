@@ -1,9 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"github.com/felipeversiane/donation-server/internal/infrastructure/config"
+	"github.com/felipeversiane/donation-server/internal/infrastructure/database"
+	"go.uber.org/fx"
 )
 
-func main(){
-	fmt.Printf("Hello GO!")
+func main() {
+	app := fx.New(
+		config.Module,
+		database.Module,
+	)
+
+	app.Run()
 }

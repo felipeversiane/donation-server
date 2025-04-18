@@ -1,4 +1,4 @@
-DOCKER_COMPOSE_FILE=docker-compose.yaml
+DOCKER_COMPOSE_FILE=docker-compose.local.yaml
 
 .PHONY: build up start stop down logs ps restart prune
 
@@ -30,5 +30,5 @@ restart:
 prune:
 	docker system prune -af --volumes
 
-link:
-	golangci-lint run --config .golangci.yml
+lint:
+	golangci-lint run --config .golangci.toml
