@@ -1,0 +1,40 @@
+[run]
+timeout = "3m"
+tests = true
+fast = true
+
+[linters]
+enable = [
+  "govet",
+  "errcheck",
+  "staticcheck",
+  "ineffassign",
+  "gosimple",
+  "gocritic",
+  "unused",       
+  "gocyclo",
+  "gofmt",
+  "goimports",
+  "revive",
+  "typecheck",
+  "errchkjson"
+]
+
+[linters-settings.gocyclo]
+min-complexity = 15
+
+[linters-settings.revive]
+severity = "warning"
+confidence = 0.8
+
+[[linters-settings.revive.rules]]
+name = "var-naming"
+
+[[linters-settings.revive.rules]]
+name = "exported"
+
+[[linters-settings.revive.rules]]
+name = "indent-error-flow"
+
+[linters-settings.goimports]
+local-prefixes = "github.com/ProjetosCodeTower/donation-server"
