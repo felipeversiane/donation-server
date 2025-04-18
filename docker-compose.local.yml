@@ -1,23 +1,48 @@
 name: donation-server
 
 services:
+  server:
+    build: 
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: donation-server
+    ports:  
+      - "8000:8000"
+    restart: unless-stopped
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+      - DB_NAME=postgres
+      - DB_SSL=disable
+      - DB_MAX_CONNECTIONS=20
+      - DB_IDLE_CONNECTIONS=10
+      - DB_CONN_MAX_LIFETIME=300
+
+
   db:
     image: postgres:13.18-alpine
-    env_file: .env
+    command: postgres -c "max_connections=600"
     container_name: donation-server-db
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "5432:5432"
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_SSL=${DB_SSL}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+      - POSTGRES_DB=postgres
+      - POSTGRES_SSL=disable
     networks:
       - default
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -q -d ${DB_NAME} -U ${DB_USER} || exit 1"]
+      test: ["CMD-SHELL", "pg_isready -q -d postgres -U postgres || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3  
@@ -25,7 +50,7 @@ services:
 
   migrator:
     image: migrate/migrate
-    container_name: donation-server-migrator
+    container_name: donation-server-migrator  
     volumes:
       - ./migrations:/migrations
     command: [
@@ -40,28 +65,11 @@ services:
     networks:
       - default
 
-  server:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.dev
-    env_file: .env
-    container_name: donation-server
-    volumes:
-      - .:/app
-    restart: unless-stopped
-    depends_on:
-      migrator:
-        condition: service_completed_successfully
-    networks:
-      - default
-    ports:
-      - "8000:8000"
-
   db_ui:
     image: sosedoff/pgweb:0.13.1
     container_name: donation-server-pgadmin
     environment:
-      - PGWEB_DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}
+      - PGWEB_DATABASE_URL=postgresql://$postgres:postgres123@db:5432/postgres?sslmode=disable
     env_file:
       - .env
     depends_on:
@@ -75,7 +83,6 @@ services:
 
 volumes:
   local_postgres_data: {}
- 
 
 networks:
   default:
