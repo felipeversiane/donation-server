@@ -14,10 +14,12 @@ var (
 
 type config struct {
 	Database   DatabaseConfig
+	HttpServer HttpServerConfig
 }
 
 type ConfigInterface interface {
 	GetDatabaseConfig() DatabaseConfig
+	GetHttpServerConfig() HttpServerConfig
 }
 
 type DatabaseConfig struct {
@@ -32,6 +34,13 @@ type DatabaseConfig struct {
 	ConnMaxLifetime int
 }
 
+type HttpServerConfig struct {
+	Port         string
+	ReadTimeout  int
+	WriteTimeout int
+	IdleTimeout  int
+	Environment  string
+}
 
 func New() ConfigInterface {
 	var cfg *config
@@ -50,6 +59,13 @@ func New() ConfigInterface {
 				MinConnections:  getEnvInt("DB_MIN_CONNECTIONS", 1),
 				ConnMaxLifetime: getEnvInt("DB_CONN_MAX_LIFETIME", 300),
 			},
+			HttpServer: HttpServerConfig{
+				Port:         getEnv("HTTP_SERVER_PORT", "8000"),
+				ReadTimeout:  getEnvInt("HTTP_SERVER_READ_TIMEOUT", 15),
+				WriteTimeout: getEnvInt("HTTP_SERVER_WRITE_TIMEOUT", 15),
+				IdleTimeout:  getEnvInt("HTTP_SERVER_IDLE_TIMEOUT", 60),
+				Environment:  getEnv("ENVIRONMENT", "development"),
+			},
 		}
 	})
 
@@ -60,6 +76,9 @@ func (c *config) GetDatabaseConfig() DatabaseConfig {
 	return c.Database
 }
 
+func (c *config) GetHttpServerConfig() HttpServerConfig {
+	return c.HttpServer
+}
 
 func getEnv(key, defaultValue string) string {
 	value := os.Getenv(key)

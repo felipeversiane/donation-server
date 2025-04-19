@@ -8,5 +8,8 @@ var Module = fx.Options(
 		func(cfg ConfigInterface) DatabaseConfig {
 			return cfg.GetDatabaseConfig()
 		},
+		func(cfg ConfigInterface) HttpServerConfig {
+			return cfg.GetHttpServerConfig()
+		},
 	),
 )
