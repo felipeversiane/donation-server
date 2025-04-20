@@ -18,12 +18,12 @@ var (
 )
 
 type database struct {
-	db     *pgxpool.Pool
+	pool   *pgxpool.Pool
 	config config.DatabaseConfig
 }
 
 type DatabaseInterface interface {
-	GetDB() *pgxpool.Pool
+	Pool() *pgxpool.Pool
 	Ping(ctx context.Context) error
 	Close()
 }
@@ -57,7 +57,7 @@ func New(config config.DatabaseConfig) (DatabaseInterface, error) {
 		}
 
 		instance = &database{
-			db:     pool,
+			pool:   pool,
 			config: config,
 		}
 
@@ -80,7 +80,7 @@ func New(config config.DatabaseConfig) (DatabaseInterface, error) {
 }
 
 func (d *database) Ping(ctx context.Context) error {
-	err := d.db.Ping(ctx)
+	err := d.pool.Ping(ctx)
 	if err != nil {
 		slog.Warn("database ping failed", "error", err)
 	}
@@ -88,14 +88,14 @@ func (d *database) Ping(ctx context.Context) error {
 }
 
 func (d *database) Close() {
-	if d.db != nil {
-		d.db.Close()
+	if d.pool != nil {
+		d.pool.Close()
 		slog.Info("database connection closed")
 	}
 }
 
-func (d *database) GetDB() *pgxpool.Pool {
-	return d.db
+func (d *database) Pool() *pgxpool.Pool {
+	return d.pool
 }
 
 func getConnectionString(config config.DatabaseConfig) string {
