@@ -2,10 +2,13 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/ulule/limiter/v3"
+	ginLimiter "github.com/ulule/limiter/v3/drivers/middleware/gin"
+	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
 
 	"github.com/felipeversiane/donation-server/internal/infrastructure/config"
 	"github.com/felipeversiane/donation-server/internal/infrastructure/database"
@@ -33,9 +36,21 @@ func New(config config.HttpServerConfig, db database.DatabaseInterface) HttpServ
 	}
 
 	router := gin.New()
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
+	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
+		slog.Error("panic recovered", "error", recovered)
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}))
+
+	router.Use(logMiddleware())
+
 	router.Use(corsMiddleware())
+
+	if config.Environment != "development" {
+		rate, _ := limiter.NewRateFromFormatted("100-S")
+		store := memoryStore.NewStore()
+		rateMiddleware := ginLimiter.NewMiddleware(limiter.New(store, rate))
+		router.Use(rateMiddleware)
+	}
 
 	server := &httpServer{
 		router: router,
@@ -49,6 +64,8 @@ func New(config config.HttpServerConfig, db database.DatabaseInterface) HttpServ
 		config: config,
 		db:     db,
 	}
+
+	server.InitRoutes()
 
 	return server
 }
@@ -69,8 +86,7 @@ func (s *httpServer) Start() error {
 	slog.Info("starting HTTP server", slog.String("port", s.config.Port))
 
 	if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		err = fmt.Errorf("failed to start server: %w", err)
-		slog.Error("server not started", "error", err)
+		slog.Error("server failed to start", "error", err)
 		return err
 	}
 
@@ -84,12 +100,13 @@ func (s *httpServer) Shutdown(ctx context.Context) error {
 	defer cancel()
 
 	if err := s.srv.Shutdown(ctx); err != nil {
-		err = fmt.Errorf("error during server shutdown: %w", err)
-		slog.Error("server shutdown unsuccessfully", "error", err)
+		slog.Error("server shutdown failed", "error", err)
 		return err
 	}
 
 	slog.Info("server shutdown completed successfully")
+	s.db.Close()
+
 	return nil
 }
 
@@ -105,5 +122,21 @@ func corsMiddleware() gin.HandlerFunc {
 		}
 
 		c.Next()
+	}
+}
+
+func logMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+		c.Next()
+		latency := time.Since(start)
+
+		slog.Info("HTTP request",
+			slog.String("method", c.Request.Method),
+			slog.String("path", c.Request.URL.Path),
+			slog.Int("status", c.Writer.Status()),
+			slog.String("client_ip", c.ClientIP()),
+			slog.Duration("latency", latency),
+		)
 	}
 }
