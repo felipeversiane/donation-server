@@ -72,3 +72,21 @@ jobs:
 
       - name: Run Vulnerability detection using govulncheck
         run: make govulncheck
+
+  test:
+    runs-on: ubuntu-22.04
+    needs: [lint, security]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: go.mod
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: make test

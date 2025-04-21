@@ -34,7 +34,10 @@ lint:
 	golangci-lint run --config .golangci.toml
 
 govulncheck: 
-	@go run golang.org/x/vuln/cmd/govulncheck ./...
+	@govulncheck ./...
 
 setup:
 	@git config core.hooksPath .githooks
+
+test:
+	go test ./... -v
