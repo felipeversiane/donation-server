@@ -65,8 +65,6 @@ func New(config config.HttpServerConfig, db database.DatabaseInterface) HttpServ
 		db:     db,
 	}
 
-	server.InitRoutes()
-
 	return server
 }
 

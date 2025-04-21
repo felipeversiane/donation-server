@@ -12,6 +12,7 @@ func main() {
 		config.Module,
 		database.Module,
 		api.Module,
+		fx.NopLogger,
 	)
 
 	app.Run()
