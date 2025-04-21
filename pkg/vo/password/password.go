@@ -18,6 +18,9 @@ type Password struct {
 }
 
 func New(value string) (Password, error) {
+	if value == "" {
+		return Password{}, errors.New("password is required")
+	}
 	if !isStrong(value) {
 		return Password{}, ErrWeakPassword
 	}

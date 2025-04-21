@@ -14,6 +14,9 @@ type Email struct {
 }
 
 func New(value string) (Email, error) {
+	if value == "" {
+		return Email{}, errors.New("email is required")
+	}
 	regex := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
 	if !regex.MatchString(value) {
 		return Email{}, ErrInvalidEmail

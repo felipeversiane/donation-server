@@ -14,6 +14,9 @@ type Phone struct {
 }
 
 func New(value string) (Phone, error) {
+	if value == "" {
+		return Phone{}, errors.New("phone is required")
+	}
 	regex := regexp.MustCompile(`^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$`)
 	if !regex.MatchString(value) {
 		return Phone{}, ErrInvalidPhone

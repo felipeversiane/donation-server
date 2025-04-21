@@ -10,6 +10,9 @@ type Document struct {
 }
 
 func New(value string) (Document, error) {
+	if value == "" {
+		return Document{}, errors.New("document is required")
+	}
 	if isValidCPF(value) || isValidCNPJ(value) {
 		return Document{value: value}, nil
 	}
