@@ -1,10 +1,15 @@
 name: main
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
+    paths-ignore: ["docs/**"]
+
+  push:
+    branches: [main, develop]
+    paths-ignore: ["docs/**"]
+
+  workflow_dispatch:
 
 jobs:
   build:
@@ -49,3 +54,21 @@ jobs:
 
       - name: Run Linter 
         run: make lint
+
+  security:
+    runs-on: ubuntu-22.04
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Download dependencies
+        run: make download
+
+      - name: Run Vulnerability detection using govulncheck
+        run: make govulncheck

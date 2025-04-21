@@ -2,6 +2,7 @@
 timeout = "3m"
 tests = true
 fast = true
+issues-exit-code = 1
 
 [linters]
 enable = [
@@ -11,17 +12,44 @@ enable = [
   "ineffassign",
   "gosimple",
   "gocritic",
-  "unused",       
+  "unused",
   "gocyclo",
   "gofmt",
   "goimports",
   "revive",
   "typecheck",
-  "errchkjson"
+  "errchkjson",
+  "cyclop",
+  "dogsled",
+  "dupl",
+  "errorlint",
+  "exhaustive",
+  "exportloopref",
+  "funlen",
+  "gochecknoglobals",
+  "goerr113",
+  "gomnd",
+  "goprintffuncname",
+  "gosec",
+  "misspell",
+  "nakedret",
+  "nestif",
+  "nilerr",
+  "noctx",
+  "nolintlint",
+  "prealloc",
+  "promlinter",
+  "unconvert",
+  "unparam",
+  "whitespace"
 ]
 
 [linters-settings.gocyclo]
 min-complexity = 15
+
+[linters-settings.funlen]
+lines = 100
+statements = 50
 
 [linters-settings.revive]
 severity = "warning"
@@ -38,3 +66,13 @@ name = "indent-error-flow"
 
 [linters-settings.goimports]
 local-prefixes = "github.com/ProjetosCodeTower/donation-server"
+
+[issues.exclude-rules]
+[[issues.exclude-rules]]
+path = "_test\\.go"
+linters = [
+  "gochecknoglobals",
+  "gosec",
+  "funlen",
+  "noctx"
+]
