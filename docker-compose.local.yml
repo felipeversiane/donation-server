@@ -31,6 +31,8 @@ services:
       - HTTP_SERVER_IDLE_TIMEOUT=60
       - LOG_LEVEL=info
       - LOG_PATH="./logs/app.log"
+      - JWT_SECRET_KEY="78931kas%&*#1i390dajs"
+      - JWT_REFRESH_SECRET_KEY="98312jk#@SDAwseDA@sdj2s"
 
   db:
     image: postgres:13.18-alpine

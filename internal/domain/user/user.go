@@ -60,7 +60,7 @@ func New(
 		updatedAt:    time.Now(),
 	}
 
-	if err := user.validate(); err != nil {
+	if err := user.Validate(); err != nil {
 		return nil, err
 	}
 
@@ -82,7 +82,7 @@ func (u *user) ComparePassword(raw string) bool {
 	return u.password.Compare(raw)
 }
 
-func (u *user) validate() error {
+func (u *user) Validate() error {
 	if u.name == "" {
 		return errors.New("name is required")
 	}
