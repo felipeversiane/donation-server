@@ -27,12 +27,12 @@ type user struct {
 
 type UserInterface interface {
 	GetID() uuid.UUID
-	GetEmail() string
-	GetPassword() string
-	GetPhone() string
-	GetName() string
+	GetEmail() email.Email
+	GetPassword() password.Password
+	GetPhone() phone.Phone
+	GetName() name.Name
 	GetAvatar() string
-	GetDocument() string
+	GetDocument() document.Document
 	IsEnterprise() bool
 	GetCreatedAt() time.Time
 	GetUpdatedAt() time.Time
@@ -85,16 +85,16 @@ func New(
 	return user, nil
 }
 
-func (u *user) GetID() uuid.UUID        { return u.id }
-func (u *user) GetEmail() string        { return u.email.String() }
-func (u *user) GetPassword() string     { return u.password.String() }
-func (u *user) GetPhone() string        { return u.phone.String() }
-func (u *user) GetName() string         { return u.name.String() }
-func (u *user) GetAvatar() string       { return u.avatar }
-func (u *user) GetDocument() string     { return u.document.String() }
-func (u *user) IsEnterprise() bool      { return u.isEnterprise }
-func (u *user) GetCreatedAt() time.Time { return u.createdAt }
-func (u *user) GetUpdatedAt() time.Time { return u.updatedAt }
+func (u *user) GetID() uuid.UUID               { return u.id }
+func (u *user) GetEmail() email.Email          { return u.email }
+func (u *user) GetPassword() password.Password { return u.password }
+func (u *user) GetPhone() phone.Phone          { return u.phone }
+func (u *user) GetName() name.Name             { return u.name }
+func (u *user) GetAvatar() string              { return u.avatar }
+func (u *user) GetDocument() document.Document { return u.document }
+func (u *user) IsEnterprise() bool             { return u.isEnterprise }
+func (u *user) GetCreatedAt() time.Time        { return u.createdAt }
+func (u *user) GetUpdatedAt() time.Time        { return u.updatedAt }
 
 func (u *user) ComparePassword(raw string) bool {
 	return u.password.Compare(raw)

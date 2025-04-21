@@ -23,7 +23,7 @@ func TestNewUser(t *testing.T) {
 			inputName:    "Alice Smith",
 			inputEmail:   "alice@example.com",
 			inputPass:    "StrongPass123!",
-			inputPhone:   "+5511988887777",
+			inputPhone:   "5511988887777",
 			inputDoc:     "12345678900",
 			inputAvatar:  "https://example.com/avatar.png",
 			isEnterprise: false,
@@ -34,7 +34,7 @@ func TestNewUser(t *testing.T) {
 			inputName:    "Alice",
 			inputEmail:   "alice@@com",
 			inputPass:    "StrongPass123!",
-			inputPhone:   "+5511988887777",
+			inputPhone:   "5511988887777",
 			inputDoc:     "12345678900",
 			inputAvatar:  "",
 			isEnterprise: false,
@@ -45,7 +45,7 @@ func TestNewUser(t *testing.T) {
 			inputName:    "Bob",
 			inputEmail:   "bob@example.com",
 			inputPass:    "123",
-			inputPhone:   "+5511988887777",
+			inputPhone:   "5511988887777",
 			inputDoc:     "12345678900",
 			inputAvatar:  "",
 			isEnterprise: false,
@@ -56,7 +56,7 @@ func TestNewUser(t *testing.T) {
 			inputName:    "",
 			inputEmail:   "bob@example.com",
 			inputPass:    "StrongPass123!",
-			inputPhone:   "+5511988887777",
+			inputPhone:   "5511988887777",
 			inputDoc:     "12345678900",
 			inputAvatar:  "",
 			isEnterprise: false,
@@ -73,10 +73,10 @@ func TestNewUser(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, u)
-				assert.Equal(t, tt.inputName, u.GetName())
-				assert.Equal(t, tt.inputEmail, u.GetEmail())
-				assert.Equal(t, tt.inputPhone, u.GetPhone())
-				assert.Equal(t, tt.inputDoc, u.GetDocument())
+				assert.Equal(t, tt.inputName, u.GetName().String())
+				assert.Equal(t, tt.inputEmail, u.GetEmail().String())
+				assert.Equal(t, tt.inputPhone, u.GetPhone().String())
+				assert.Equal(t, tt.inputDoc, u.GetDocument().String())
 				assert.Equal(t, tt.inputAvatar, u.GetAvatar())
 				assert.Equal(t, tt.isEnterprise, u.IsEnterprise())
 				assert.True(t, u.ComparePassword(tt.inputPass))

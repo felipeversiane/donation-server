@@ -1,120 +1,87 @@
 package config
 
 import (
-	"os"
-	"strconv"
+	"log"
 	"sync"
 
+	"github.com/caarlos0/env/v10"
 	"github.com/joho/godotenv"
 )
 
 var (
 	once sync.Once
+	cfg  *Config
 )
 
-type config struct {
-	Database   DatabaseConfig
-	HttpServer HttpServerConfig
-	JwtToken   JwtTokenConfig
+type Config struct {
+	Database    DatabaseConfig    `envPrefix:"DB_"`
+	HttpServer  HttpServerConfig  `envPrefix:"HTTP_SERVER_"`
+	JwtToken    JwtTokenConfig    `envPrefix:"JWT_"`
+	FileStorage FileStorageConfig `envPrefix:"FILE_STORAGE_"`
 }
 
 type ConfigInterface interface {
 	GetDatabaseConfig() DatabaseConfig
 	GetHttpServerConfig() HttpServerConfig
 	GetJwtTokenConfig() JwtTokenConfig
+	GetFileStorageConfig() FileStorageConfig
 }
 
 type DatabaseConfig struct {
-	Host            string
-	Port            string
-	User            string
-	Password        string
-	Name            string
-	SslMode         string
-	MaxConnections  int
-	MinConnections  int
-	ConnMaxLifetime int
+	Host            string `env:"HOST" envDefault:"localhost"`
+	Port            string `env:"PORT" envDefault:"5432"`
+	User            string `env:"USER" envDefault:"user"`
+	Password        string `env:"PASSWORD" envDefault:""`
+	Name            string `env:"NAME" envDefault:"db"`
+	SslMode         string `env:"SSL" envDefault:"disable"`
+	MaxConnections  int    `env:"MAX_CONNECTIONS" envDefault:"20"`
+	MinConnections  int    `env:"MIN_CONNECTIONS" envDefault:"1"`
+	ConnMaxLifetime int    `env:"CONN_MAX_LIFETIME" envDefault:"300"`
 }
 
 type HttpServerConfig struct {
-	Port         string
-	ReadTimeout  int
-	WriteTimeout int
-	IdleTimeout  int
-	Environment  string
+	Port         string `env:"PORT" envDefault:"8000"`
+	ReadTimeout  int    `env:"READ_TIMEOUT" envDefault:"15"`
+	WriteTimeout int    `env:"WRITE_TIMEOUT" envDefault:"15"`
+	IdleTimeout  int    `env:"IDLE_TIMEOUT" envDefault:"60"`
+	Environment  string `env:"ENVIRONMENT" envDefault:"development"`
 }
 
 type JwtTokenConfig struct {
-	SecretKey        string
-	SecretRefreshKey string
-	Environment      string
+	SecretKey        string `env:"SECRET_KEY" envDefault:"3891aSDk23aSDa3j#@sd"`
+	SecretRefreshKey string `env:"REFRESH_SECRET_KEY" envDefault:"h3i12iaSD32u98da@#%aisd"`
+	Environment      string `env:"ENVIRONMENT" envDefault:"development"`
+}
+
+type FileStorageConfig struct {
+	BasePath string `env:"PATH" envDefault:"./uploads"`
+	MaxSize  int64  `env:"MAX_SIZE" envDefault:"5242880"` 
 }
 
 func New() ConfigInterface {
-	var cfg *config
 	once.Do(func() {
 		_ = godotenv.Load()
 
-		cfg = &config{
-			Database: DatabaseConfig{
-				Host:            getEnv("DB_HOST", "localhost"),
-				Port:            getEnv("DB_PORT", "5432"),
-				User:            getEnv("DB_USER", "user"),
-				Password:        getEnv("DB_PASSWORD", ""),
-				Name:            getEnv("DB_NAME", "db"),
-				SslMode:         getEnv("DB_SSL", "disable"),
-				MaxConnections:  getEnvInt("DB_MAX_CONNECTIONS", 20),
-				MinConnections:  getEnvInt("DB_MIN_CONNECTIONS", 1),
-				ConnMaxLifetime: getEnvInt("DB_CONN_MAX_LIFETIME", 300),
-			},
-			HttpServer: HttpServerConfig{
-				Port:         getEnv("HTTP_SERVER_PORT", "8000"),
-				ReadTimeout:  getEnvInt("HTTP_SERVER_READ_TIMEOUT", 15),
-				WriteTimeout: getEnvInt("HTTP_SERVER_WRITE_TIMEOUT", 15),
-				IdleTimeout:  getEnvInt("HTTP_SERVER_IDLE_TIMEOUT", 60),
-				Environment:  getEnv("ENVIRONMENT", "development"),
-			},
-			JwtToken: JwtTokenConfig{
-				SecretKey:        getEnv("JWT_SECRET_KEY", "3891aSDk23aSDa3j#@sd"),
-				SecretRefreshKey: getEnv("JWT_REFRESH_SECRET_KEY", "h3i12iaSD32u98da@#%aisd"),
-				Environment:      getEnv("ENVIRONMENT", "development"),
-			},
+		cfg = &Config{}
+		if err := env.Parse(cfg); err != nil {
+			log.Fatalf("error parsing config: %v", err)
 		}
 	})
-
 	return cfg
 }
 
-func (c *config) GetDatabaseConfig() DatabaseConfig {
+func (c *Config) GetDatabaseConfig() DatabaseConfig {
 	return c.Database
 }
 
-func (c *config) GetHttpServerConfig() HttpServerConfig {
+func (c *Config) GetHttpServerConfig() HttpServerConfig {
 	return c.HttpServer
 }
 
-func (c *config) GetJwtTokenConfig() JwtTokenConfig {
+func (c *Config) GetJwtTokenConfig() JwtTokenConfig {
 	return c.JwtToken
 }
 
-func getEnv(key, defaultValue string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		if defaultValue != "" {
-			return defaultValue
-		}
-	}
-	return value
-}
-
-func getEnvInt(key string, defaultValue int) int {
-	value := os.Getenv(key)
-	if value == "" {
-		return defaultValue
-	}
-	parsedValue, err := strconv.Atoi(value)
-	if err != nil {
-		return defaultValue
-	}
-	return parsedValue
+func (c *Config) GetFileStorageConfig() FileStorageConfig {
+	return c.FileStorage
 }
