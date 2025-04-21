@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"time"
 
 	"github.com/felipeversiane/donation-server/pkg/vo/document"
@@ -45,8 +46,8 @@ func New(
 	document document.Document,
 	name, avatar string,
 	isEnterprise bool,
-) UserInterface {
-	return &user{
+) (UserInterface, error) {
+	user := &user{
 		id:           uuid.Must(uuid.NewV7()),
 		email:        email,
 		password:     password,
@@ -58,6 +59,12 @@ func New(
 		createdAt:    time.Now(),
 		updatedAt:    time.Now(),
 	}
+
+	if err := user.validate(); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (u *user) GetID() uuid.UUID        { return u.id }
@@ -73,4 +80,26 @@ func (u *user) GetUpdatedAt() time.Time { return u.updatedAt }
 
 func (u *user) ComparePassword(raw string) bool {
 	return u.password.Compare(raw)
+}
+
+func (u *user) validate() error {
+	if u.name == "" {
+		return errors.New("name is required")
+	}
+	if len(u.name) > 100 {
+		return errors.New("name must be at most 100 characters")
+	}
+	if u.email.String() == "" {
+		return errors.New("email is required")
+	}
+	if u.password.String() == "" {
+		return errors.New("password is required")
+	}
+	if u.phone.String() == "" {
+		return errors.New("phone is required")
+	}
+	if u.document.String() == "" {
+		return errors.New("document is required")
+	}
+	return nil
 }
