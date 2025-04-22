@@ -15,6 +15,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	ErrPanicRecovered      = "panic recovered"
+	MsgStartingHTTPServer  = "starting HTTP server"
+	ErrServerFailedToStart = "server failed to start"
+	MsgInitiatingShutdown  = "initiating graceful shutdown"
+	ErrShutdownFailed      = "server shutdown failed"
+	MsgShutdownSuccessful  = "server shutdown completed successfully"
+	MsgHTTPRequest         = "HTTP request"
+)
+
 type httpServer struct {
 	router *gin.Engine
 	srv    *http.Server
@@ -37,12 +47,11 @@ func New(config config.HttpServerConfig, db database.DatabaseInterface) HttpServ
 
 	router := gin.New()
 	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
-		slog.Error("panic recovered", "error", recovered)
+		slog.Error(ErrPanicRecovered, "error", recovered)
 		c.AbortWithStatus(http.StatusInternalServerError)
 	}))
 
 	router.Use(logMiddleware())
-
 	router.Use(corsMiddleware())
 
 	if config.Environment != "development" {
@@ -81,10 +90,10 @@ func (s *httpServer) InitRoutes() {
 }
 
 func (s *httpServer) Start() error {
-	slog.Info("starting HTTP server", slog.String("port", s.config.Port))
+	slog.Info(MsgStartingHTTPServer, slog.String("port", s.config.Port))
 
 	if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		slog.Error("server failed to start", "error", err)
+		slog.Error(ErrServerFailedToStart, "error", err)
 		return err
 	}
 
@@ -92,17 +101,17 @@ func (s *httpServer) Start() error {
 }
 
 func (s *httpServer) Shutdown(ctx context.Context) error {
-	slog.Info("initiating graceful shutdown")
+	slog.Info(MsgInitiatingShutdown)
 
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	if err := s.srv.Shutdown(ctx); err != nil {
-		slog.Error("server shutdown failed", "error", err)
+		slog.Error(ErrShutdownFailed, "error", err)
 		return err
 	}
 
-	slog.Info("server shutdown completed successfully")
+	slog.Info(MsgShutdownSuccessful)
 	s.db.Close()
 
 	return nil
@@ -129,7 +138,7 @@ func logMiddleware() gin.HandlerFunc {
 		c.Next()
 		latency := time.Since(start)
 
-		slog.Info("HTTP request",
+		slog.Info(MsgHTTPRequest,
 			slog.String("method", c.Request.Method),
 			slog.String("path", c.Request.URL.Path),
 			slog.Int("status", c.Writer.Status()),
