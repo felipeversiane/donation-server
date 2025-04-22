@@ -1,7 +1,7 @@
 package config
 
 import (
-	"log"
+	"log/slog"
 	"sync"
 
 	"github.com/caarlos0/env/v10"
@@ -55,7 +55,7 @@ type JwtTokenConfig struct {
 
 type FileStorageConfig struct {
 	BasePath string `env:"PATH" envDefault:"./uploads"`
-	MaxSize  int64  `env:"MAX_SIZE" envDefault:"5242880"` 
+	MaxSize  int64  `env:"MAX_SIZE" envDefault:"5242880"`
 }
 
 func New() ConfigInterface {
@@ -64,7 +64,7 @@ func New() ConfigInterface {
 
 		cfg = &Config{}
 		if err := env.Parse(cfg); err != nil {
-			log.Fatalf("error parsing config: %v", err)
+			slog.Error("error parsing config", "error", err)
 		}
 	})
 	return cfg
