@@ -54,8 +54,10 @@ type JwtTokenConfig struct {
 }
 
 type FileStorageConfig struct {
-	BasePath string `env:"PATH" envDefault:"./uploads"`
-	MaxSize  int64  `env:"MAX_SIZE" envDefault:"5242880"`
+	BasePath             string `env:"PATH" envDefault:"./uploads"`
+	MaxSize              int64  `env:"MAX_SIZE" envDefault:"5242880"`
+	FilePermissions      uint32 `env:"FILE_PERMISSIONS" envDefault:"0644"`
+	DirectoryPermissions uint32 `env:"DIRECTORY_PERMISSIONS" envDefault:"0755"`
 }
 
 func New() ConfigInterface {
