@@ -19,20 +19,22 @@ type address struct {
 	street       string
 	number       string
 	complement   string
+	userID       uuid.UUID
 	createdAt    time.Time
 	updatedAt    time.Time
 }
 
 type AddressInterface interface {
 	GetID() uuid.UUID
-	GetCountry() string
-	GetZipCode() string
+	GetCountry() country.Country
+	GetZipCode() zipcode.ZipCode
 	GetState() string
 	GetCity() string
 	GetNeighborhood() string
 	GetStreet() string
 	GetNumber() string
 	GetComplement() string
+	GetUserID() uuid.UUID
 	GetCreatedAt() time.Time
 	GetUpdatedAt() time.Time
 }
@@ -97,14 +99,15 @@ func New(
 	return address, nil
 }
 
-func (a *address) GetID() uuid.UUID        { return a.id }
-func (a *address) GetCountry() string      { return a.country.String() }
-func (a *address) GetZipCode() string      { return a.zipCode.String() }
-func (a *address) GetState() string        { return a.state }
-func (a *address) GetCity() string         { return a.city }
-func (a *address) GetNeighborhood() string { return a.neighborhood }
-func (a *address) GetStreet() string       { return a.street }
-func (a *address) GetNumber() string       { return a.number }
-func (a *address) GetComplement() string   { return a.complement }
-func (a *address) GetCreatedAt() time.Time { return a.createdAt }
-func (a *address) GetUpdatedAt() time.Time { return a.updatedAt }
+func (a *address) GetID() uuid.UUID            { return a.id }
+func (a *address) GetCountry() country.Country { return a.country }
+func (a *address) GetZipCode() zipcode.ZipCode { return a.zipCode }
+func (a *address) GetState() string            { return a.state }
+func (a *address) GetCity() string             { return a.city }
+func (a *address) GetNeighborhood() string     { return a.neighborhood }
+func (a *address) GetStreet() string           { return a.street }
+func (a *address) GetNumber() string           { return a.number }
+func (a *address) GetComplement() string       { return a.complement }
+func (a *address) GetCreatedAt() time.Time     { return a.createdAt }
+func (a *address) GetUpdatedAt() time.Time     { return a.updatedAt }
+func (a *address) GetUserID() uuid.UUID        { return a.userID }

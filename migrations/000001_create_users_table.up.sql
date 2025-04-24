@@ -7,8 +7,6 @@ CREATE TABLE IF NOT EXISTS users (
     avatar TEXT,
     email VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    document_id UUID UNIQUE REFERENCES documents(id) ON DELETE SET NULL,
-    address_id UUID UNIQUE REFERENCES addresses(id) ON DELETE SET NULL,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP NOT NULL DEFAULT now()
 );

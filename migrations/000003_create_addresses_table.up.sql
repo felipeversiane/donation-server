@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS addresses (
     street VARCHAR(255),
     number VARCHAR(20),
     complement VARCHAR(255)
+    user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP NOT NULL DEFAULT now()
 );

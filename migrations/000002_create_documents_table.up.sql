@@ -2,10 +2,11 @@ CREATE TABLE IF NOT EXISTS documents (
     id UUID PRIMARY KEY,
     type VARCHAR(20) NOT NULL,
     value VARCHAR(20) NOT NULL UNIQUE,
+    user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP NOT NULL DEFAULT now(),
 
-    CONSTRAINT chk_document_type CHECK (type IN ('cpf', 'cnpj'))
+    CONSTRAINT check_document_type CHECK (type IN ('cpf', 'cnpj'))
 );
 
 

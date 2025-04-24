@@ -20,6 +20,7 @@ type document struct {
 	id        uuid.UUID
 	docType   Type
 	value     string
+	userID    uuid.UUID
 	createdAt time.Time
 	updatedAt time.Time
 }
@@ -28,6 +29,7 @@ type DocumentInterface interface {
 	GetID() uuid.UUID
 	GetType() Type
 	GetValue() string
+	GetUserID() uuid.UUID
 	GetCreatedAt() time.Time
 	GetUpdatedAt() time.Time
 }
@@ -61,3 +63,4 @@ func (d *document) GetType() Type           { return d.docType }
 func (d *document) GetValue() string        { return d.value }
 func (d *document) GetCreatedAt() time.Time { return d.createdAt }
 func (d *document) GetUpdatedAt() time.Time { return d.updatedAt }
+func (d *document) GetUserID() uuid.UUID    { return d.userID }
