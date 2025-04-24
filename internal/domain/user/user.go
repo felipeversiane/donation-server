@@ -1,11 +1,11 @@
 package user
 
 import (
+	"errors"
 	"time"
 
-	"github.com/felipeversiane/donation-server/pkg/vo/document"
+	"github.com/felipeversiane/donation-server/pkg/helpers"
 	"github.com/felipeversiane/donation-server/pkg/vo/email"
-	"github.com/felipeversiane/donation-server/pkg/vo/name"
 	"github.com/felipeversiane/donation-server/pkg/vo/password"
 	"github.com/felipeversiane/donation-server/pkg/vo/phone"
 
@@ -13,40 +13,47 @@ import (
 )
 
 type user struct {
-	id           uuid.UUID
-	name         name.Name
-	email        email.Email
-	password     password.Password
-	phone        phone.Phone
-	avatar       string
-	document     document.Document
-	isEnterprise bool
-	createdAt    time.Time
-	updatedAt    time.Time
+	id         uuid.UUID
+	name       string
+	email      email.Email
+	password   password.Password
+	phone      phone.Phone
+	avatar     string
+	documentID uuid.UUID
+	addressID  uuid.UUID
+	createdAt  time.Time
+	updatedAt  time.Time
 }
 
 type UserInterface interface {
 	GetID() uuid.UUID
-	GetEmail() email.Email
-	GetPassword() password.Password
-	GetPhone() phone.Phone
-	GetName() name.Name
+	GetEmail() string
+	GetPassword() string
+	GetPhone() string
+	GetName() string
 	GetAvatar() string
-	GetDocument() document.Document
-	IsEnterprise() bool
+	GetDocumentID() uuid.UUID
+	GetAddressID() uuid.UUID
 	GetCreatedAt() time.Time
 	GetUpdatedAt() time.Time
 	ComparePassword(raw string) bool
 }
 
 func New(
-	nameStr, emailStr, passwordStr, phoneStr, documentStr, avatar string,
-	isEnterprise bool,
+	name, emailStr, passwordStr, phoneStr, documentStr, avatar string,
+	documentID, addressID uuid.UUID,
 ) (UserInterface, error) {
 
-	name, err := name.New(nameStr)
-	if err != nil {
+	if err := helpers.ValidateRequired(name, "name"); err != nil {
 		return nil, err
+	}
+
+	if err := helpers.ValidateMaxLength(name, 100, "name"); err != nil {
+		return nil, err
+	}
+
+	if avatar == "" {
+		return nil, errors.New("avatar is required")
 	}
 
 	email, err := email.New(emailStr)
@@ -64,37 +71,32 @@ func New(
 		return nil, err
 	}
 
-	document, err := document.New(documentStr)
-	if err != nil {
-		return nil, err
-	}
-
 	user := &user{
-		id:           uuid.Must(uuid.NewV7()),
-		name:         name,
-		email:        email,
-		password:     password,
-		phone:        phone,
-		avatar:       avatar,
-		document:     document,
-		isEnterprise: isEnterprise,
-		createdAt:    time.Now(),
-		updatedAt:    time.Now(),
+		id:         uuid.Must(uuid.NewV7()),
+		name:       name,
+		email:      email,
+		password:   password,
+		phone:      phone,
+		avatar:     avatar,
+		documentID: documentID,
+		addressID:  addressID,
+		createdAt:  time.Now(),
+		updatedAt:  time.Now(),
 	}
 
 	return user, nil
 }
 
-func (u *user) GetID() uuid.UUID               { return u.id }
-func (u *user) GetEmail() email.Email          { return u.email }
-func (u *user) GetPassword() password.Password { return u.password }
-func (u *user) GetPhone() phone.Phone          { return u.phone }
-func (u *user) GetName() name.Name             { return u.name }
-func (u *user) GetAvatar() string              { return u.avatar }
-func (u *user) GetDocument() document.Document { return u.document }
-func (u *user) IsEnterprise() bool             { return u.isEnterprise }
-func (u *user) GetCreatedAt() time.Time        { return u.createdAt }
-func (u *user) GetUpdatedAt() time.Time        { return u.updatedAt }
+func (u *user) GetID() uuid.UUID         { return u.id }
+func (u *user) GetEmail() string         { return u.email.String() }
+func (u *user) GetPassword() string      { return u.password.String() }
+func (u *user) GetPhone() string         { return u.phone.String() }
+func (u *user) GetName() string          { return u.name }
+func (u *user) GetAvatar() string        { return u.avatar }
+func (u *user) GetDocumentID() uuid.UUID { return u.documentID }
+func (u *user) GetAddressID() uuid.UUID  { return u.addressID }
+func (u *user) GetCreatedAt() time.Time  { return u.createdAt }
+func (u *user) GetUpdatedAt() time.Time  { return u.updatedAt }
 
 func (u *user) ComparePassword(raw string) bool {
 	return u.password.Compare(raw)

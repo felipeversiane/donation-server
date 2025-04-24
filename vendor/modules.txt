@@ -49,8 +49,6 @@ github.com/cloudwego/base64x/internal/native
 github.com/cloudwego/base64x/internal/native/avx2
 github.com/cloudwego/base64x/internal/native/sse
 github.com/cloudwego/base64x/internal/rt
-# github.com/cloudwego/iasm v0.2.0
-## explicit; go 1.16
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew
@@ -143,6 +141,9 @@ github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.2
 ## explicit; go 1.12
 github.com/modern-go/reflect2
+# github.com/pariz/gountries v0.1.6
+## explicit; go 1.17
+github.com/pariz/gountries
 # github.com/pelletier/go-toml/v2 v2.2.4
 ## explicit; go 1.21.0
 github.com/pelletier/go-toml/v2
@@ -277,6 +278,9 @@ google.golang.org/protobuf/proto
 google.golang.org/protobuf/reflect/protoreflect
 google.golang.org/protobuf/reflect/protoregistry
 google.golang.org/protobuf/runtime/protoiface
+# gopkg.in/yaml.v2 v2.4.0
+## explicit; go 1.15
+gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3

@@ -2,19 +2,24 @@ package country
 
 import (
 	"errors"
-	"strings"
+
+	"github.com/pariz/gountries"
 )
 
-type Country string
+type Country struct {
+	value string
+}
 
-func New(value string) (Country, error) {
-	value = strings.TrimSpace(value)
-	if value == "" {
-		return "", errors.New("country cannot be empty")
+func New(input string) (Country, error) {
+	query := gountries.New()
+	_, err := query.FindCountryByName(input)
+	if err != nil {
+		return Country{}, errors.New("invalid country name")
 	}
-	return Country(value), nil
+
+	return Country{value: input}, nil
 }
 
 func (c Country) String() string {
-	return string(c)
+	return c.value
 }

@@ -13,9 +13,13 @@ func TestNewCountry(t *testing.T) {
 		isValid  bool
 	}{
 		{"Brazil", "Brazil", true},
-		{"USA", "USA", true},
+		{"United States", "United States", true},
+		{"Canada", "Canada", true},
+		{"Germany", "Germany", true},
+		{"Br", "", false},
+		{"Brasília", "", false},
 		{"", "", false},
-		{"12345", "", false},
+		{"123", "", false},
 	}
 
 	for _, tt := range tests {
