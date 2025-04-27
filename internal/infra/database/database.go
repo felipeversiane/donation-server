@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/felipeversiane/donation-server/internal/infrastructure/config"
+	"github.com/felipeversiane/donation-server/internal/config"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

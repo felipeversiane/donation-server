@@ -18,3 +18,10 @@ func ValidateMaxLength(value string, max int, fieldName string) error {
 	}
 	return nil
 }
+
+func ValidateMinLength(value string, min int, fieldName string) error {
+	if len(value) < min {
+		return fmt.Errorf("%s must be at least %d characters", fieldName, min)
+	}
+	return nil
+}

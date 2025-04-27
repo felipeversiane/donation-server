@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewPassword(t *testing.T) {
+func TestNew(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected string

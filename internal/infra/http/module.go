@@ -1,10 +1,10 @@
-package api
+package http
 
 import (
 	"context"
 
-	"github.com/felipeversiane/donation-server/internal/infrastructure/config"
-	"github.com/felipeversiane/donation-server/internal/infrastructure/database"
+	"github.com/felipeversiane/donation-server/internal/config"
+	"github.com/felipeversiane/donation-server/internal/infra/database"
 	"go.uber.org/fx"
 )
 

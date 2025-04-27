@@ -3,7 +3,7 @@ package filestorage
 import (
 	"context"
 
-	"github.com/felipeversiane/donation-server/internal/infrastructure/config"
+	"github.com/felipeversiane/donation-server/internal/config"
 	"go.uber.org/fx"
 )
 

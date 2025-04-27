@@ -9,85 +9,114 @@ import (
 	"github.com/felipeversiane/donation-server/pkg/vo/phone"
 
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
-type user struct {
-	id        uuid.UUID
-	name      string
-	email     email.Email
-	password  password.Password
-	phone     phone.Phone
-	avatar    string
-	createdAt time.Time
-	updatedAt time.Time
-}
-
-type UserInterface interface {
-	GetID() uuid.UUID
-	GetEmail() email.Email
-	GetPassword() password.Password
-	GetPhone() phone.Phone
-	GetName() string
-	GetAvatar() string
-	GetCreatedAt() time.Time
-	GetUpdatedAt() time.Time
-	ComparePassword(raw string) bool
+type User struct {
+	ID        uuid.UUID         `json:"id"`
+	Name      string            `json:"name"`
+	Email     email.Email       `json:"email"`
+	Password  password.Password `json:"-"`
+	Phone     phone.Phone       `json:"phone"`
+	Avatar    string            `json:"avatar"`
+	CreatedAt time.Time         `json:"created_at"`
+	UpdatedAt time.Time         `json:"updated_at"`
 }
 
 func New(
-	name, emailStr, passwordStr, phoneStr, documentStr, avatar string,
-) (UserInterface, error) {
-
+	name, emailStr, passwordStr, phoneStr, avatar string,
+) (*User, error) {
 	if err := helpers.ValidateRequired(name, "name"); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "validating name")
 	}
-
+	if err := helpers.ValidateMinLength(name, 2, "name"); err != nil {
+		return nil, errors.Wrap(err, "validating minimum name length")
+	}
 	if err := helpers.ValidateMaxLength(name, 100, "name"); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "validating maximum name length")
 	}
 
 	if err := helpers.ValidateRequired(avatar, "avatar"); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "validating avatar")
 	}
 
-	email, err := email.New(emailStr)
+	emailVO, err := email.New(emailStr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "creating email")
 	}
 
-	password, err := password.New(passwordStr)
+	passVO, err := password.New(passwordStr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "creating password")
 	}
 
-	phone, err := phone.New(phoneStr)
+	phoneVO, err := phone.New(phoneStr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "creating phone")
 	}
 
-	user := &user{
-		id:        uuid.Must(uuid.NewV7()),
-		name:      name,
-		email:     email,
-		password:  password,
-		phone:     phone,
-		avatar:    avatar,
-		createdAt: time.Now(),
-		updatedAt: time.Now(),
+	id, err := uuid.NewV7()
+	if err != nil {
+		return nil, errors.Wrap(err, "generating user uuid")
 	}
 
-	return user, nil
+	now := time.Now()
+
+	return &User{
+		ID:        id,
+		Name:      name,
+		Email:     emailVO,
+		Password:  passVO,
+		Phone:     phoneVO,
+		Avatar:    avatar,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}, nil
 }
 
-func (u *user) GetID() uuid.UUID               { return u.id }
-func (u *user) GetEmail() email.Email          { return u.email }
-func (u *user) GetPassword() password.Password { return u.password }
-func (u *user) GetPhone() phone.Phone          { return u.phone }
-func (u *user) GetName() string                { return u.name }
-func (u *user) GetAvatar() string              { return u.avatar }
-func (u *user) GetCreatedAt() time.Time        { return u.createdAt }
-func (u *user) GetUpdatedAt() time.Time        { return u.updatedAt }
+func (u *User) Update(name, avatar string, phone phone.Phone) error {
+	if err := helpers.ValidateRequired(name, "name"); err != nil {
+		return errors.Wrap(err, "validating name")
+	}
+	if err := helpers.ValidateMinLength(name, 2, "name"); err != nil {
+		return errors.Wrap(err, "validating minimum name length")
+	}
+	if err := helpers.ValidateMaxLength(name, 100, "name"); err != nil {
+		return errors.Wrap(err, "validating maximum name length")
+	}
+	if err := helpers.ValidateRequired(avatar, "avatar"); err != nil {
+		return errors.Wrap(err, "validating avatar")
+	}
 
-func (u *user) ComparePassword(raw string) bool {
-	return u.password.Compare(raw)
+	u.Name = name
+	u.Avatar = avatar
+	u.Phone = phone
+	u.UpdatedAt = time.Now()
+	return nil
+}
+
+func (u *User) ChangePassword(newPasswordStr string) error {
+	newPassword, err := password.New(newPasswordStr)
+	if err != nil {
+		return errors.Wrap(err, "validating new password")
+	}
+
+	u.Password = newPassword
+	u.UpdatedAt = time.Now()
+	return nil
+}
+
+func (u *User) ChangeEmail(newEmailStr string) error {
+	newEmail, err := email.New(newEmailStr)
+	if err != nil {
+		return errors.Wrap(err, "validating new email")
+	}
+
+	u.Email = newEmail
+	u.UpdatedAt = time.Now()
+	return nil
+}
+
+func (u *User) ComparePassword(raw string) bool {
+	return u.Password.Compare(raw)
 }
