@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"github.com/felipeversiane/donation-server/pkg/helpers"
-	"github.com/google/uuid"
+	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNew(t *testing.T) {
-	validUserID := uuid.New()
+	validUserID, _ := uuid.New()
 
 	tests := []struct {
 		name         string
@@ -76,7 +76,7 @@ func TestNew(t *testing.T) {
 			name:         "nil user ID",
 			docType:      "cpf",
 			value:        "12345678901",
-			userID:       uuid.Nil,
+			userID:       uuid.UUID{},
 			expectedErr:  true,
 			errorMessage: "user ID is required",
 		},
@@ -109,7 +109,7 @@ func TestNew(t *testing.T) {
 				}
 
 				assert.Equal(t, tt.userID, doc.UserID)
-				assert.NotEqual(t, uuid.Nil, doc.ID)
+				assert.NotEqual(t, uuid.UUID{}, doc.ID)
 				assert.WithinDuration(t, time.Now(), doc.CreatedAt, 2*time.Second)
 				assert.WithinDuration(t, time.Now(), doc.UpdatedAt, 2*time.Second)
 			}
@@ -164,7 +164,7 @@ func TestIsValid(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	validUserID := uuid.New()
+	validUserID, _ := uuid.New()
 
 	cpfDoc, _ := New("cpf", "12345678901", validUserID)
 	cnpjDoc, _ := New("cnpj", "12345678000190", validUserID)

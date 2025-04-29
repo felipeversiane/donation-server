@@ -6,8 +6,8 @@ import (
 
 	"github.com/felipeversiane/donation-server/pkg/helpers"
 	"github.com/felipeversiane/donation-server/pkg/vo/country"
+	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
 	"github.com/felipeversiane/donation-server/pkg/vo/zipcode"
-	"github.com/google/uuid"
 )
 
 type Address struct {
@@ -64,16 +64,21 @@ func New(
 		}
 	}
 
-	if userID == uuid.Nil {
+	if userID.IsNil() {
 		return nil, errors.New("user_id is required")
 	}
 
-	c, err := country.New(countryStr)
+	country, err := country.New(countryStr)
 	if err != nil {
 		return nil, err
 	}
 
-	z, err := zipcode.New(zipCodeStr)
+	zipCode, err := zipcode.New(zipCodeStr)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := uuid.New()
 	if err != nil {
 		return nil, err
 	}
@@ -81,9 +86,9 @@ func New(
 	now := time.Now()
 
 	return &Address{
-		ID:           uuid.Must(uuid.NewV7()),
-		Country:      c,
-		ZipCode:      z,
+		ID:           id,
+		Country:      country,
+		ZipCode:      zipCode,
 		State:        state,
 		City:         city,
 		Neighborhood: neighborhood,

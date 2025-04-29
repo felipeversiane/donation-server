@@ -8,7 +8,7 @@ import (
 	"github.com/felipeversiane/donation-server/pkg/vo/password"
 	"github.com/felipeversiane/donation-server/pkg/vo/phone"
 
-	"github.com/google/uuid"
+	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -55,9 +55,9 @@ func New(
 		return nil, errors.Wrap(err, "creating phone")
 	}
 
-	id, err := uuid.NewV7()
+	id, err := uuid.New()
 	if err != nil {
-		return nil, errors.Wrap(err, "generating user uuid")
+		return nil, err
 	}
 
 	now := time.Now()

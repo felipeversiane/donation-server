@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/felipeversiane/donation-server/pkg/helpers"
-	"github.com/google/uuid"
+	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -30,7 +30,7 @@ func New(docTypeStr, value string, userID uuid.UUID) (*Document, error) {
 		return nil, errors.New("invalid document type")
 	}
 
-	if userID == uuid.Nil {
+	if userID.IsNil() {
 		return nil, errors.New("user_id is required")
 	}
 
@@ -46,9 +46,9 @@ func New(docTypeStr, value string, userID uuid.UUID) (*Document, error) {
 		}
 	}
 
-	id, err := uuid.NewV7()
+	id, err := uuid.New()
 	if err != nil {
-		return nil, errors.Wrap(err, "generating document ID")
+		return nil, err
 	}
 
 	now := time.Now()

@@ -3,12 +3,12 @@ package address
 import (
 	"testing"
 
-	"github.com/google/uuid"
+	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNew(t *testing.T) {
-	validUserID := uuid.New()
+	validUserID, _ := uuid.New()
 	validCountry := "BR"
 	validZipCode := "12345-678"
 	validState := "São Paulo"
@@ -69,7 +69,7 @@ func TestNew(t *testing.T) {
 			street:         validStreet,
 			number:         validNumber,
 			complement:     validComplement,
-			userID:         uuid.Nil,
+			userID:         uuid.UUID{},  
 			expectError:    true,
 			expectedErrMsg: "user_id is required",
 		},
@@ -132,7 +132,7 @@ func TestNew(t *testing.T) {
 				assert.Equal(t, tt.street, address.Street)
 				assert.Equal(t, tt.number, address.Number)
 				assert.Equal(t, tt.complement, address.Complement)
-				assert.Equal(t, tt.userID, address.UserID)
+				assert.Equal(t, tt.userID.UUID(), address.UserID.UUID())
 			}
 		})
 	}

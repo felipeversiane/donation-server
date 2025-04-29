@@ -34,3 +34,7 @@ func (u UUID) String() string {
 func (u UUID) UUID() uuid.UUID {
 	return u.value
 }
+
+func (u UUID) IsNil() bool {
+	return u.value == uuid.Nil
+}
