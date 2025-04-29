@@ -17,6 +17,14 @@ var (
 	instance *fileStorage
 )
 
+type fileStorage struct {
+	config        config.FileStorageConfig
+	basePath      string
+	permissions   os.FileMode
+	isInitialized bool
+	mutex         sync.RWMutex
+}
+
 type FileStorageInterface interface {
 	SaveFile(ctx context.Context, path string, content []byte) error
 	ReadFile(ctx context.Context, path string) ([]byte, error)
@@ -24,14 +32,6 @@ type FileStorageInterface interface {
 	Exists(ctx context.Context, path string) (bool, error)
 	HealthCheck(ctx context.Context) error
 	Close()
-}
-
-type fileStorage struct {
-	config        config.FileStorageConfig
-	basePath      string
-	permissions   os.FileMode
-	isInitialized bool
-	mutex         sync.RWMutex
 }
 
 func New(config config.FileStorageConfig) (FileStorageInterface, error) {
