@@ -10,8 +10,8 @@ import (
 	ginLimiter "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
 
+	"github.com/felipeversiane/donation-server/internal/adapter/out/database"
 	"github.com/felipeversiane/donation-server/internal/config"
-	"github.com/felipeversiane/donation-server/internal/infra/database"
 	"github.com/gin-gonic/gin"
 )
 
