@@ -10,8 +10,8 @@ import (
 	ginLimiter "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
 
+	"github.com/felipeversiane/donation-server/config"
 	"github.com/felipeversiane/donation-server/internal/adapter/out/database"
-	"github.com/felipeversiane/donation-server/internal/config"
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,6 +30,7 @@ type httpServer struct {
 	srv    *http.Server
 	config config.HttpServerConfig
 	db     database.DatabaseInterface
+	env    string
 }
 
 type HttpServerInterface interface {
@@ -38,8 +39,8 @@ type HttpServerInterface interface {
 	InitRoutes()
 }
 
-func New(config config.HttpServerConfig, db database.DatabaseInterface) HttpServerInterface {
-	if config.Environment == "development" {
+func New(config config.HttpServerConfig, env string, db database.DatabaseInterface) HttpServerInterface {
+	if env == "development" {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
@@ -53,9 +54,10 @@ func New(config config.HttpServerConfig, db database.DatabaseInterface) HttpServ
 
 	router.Use(logMiddleware())
 	router.Use(corsMiddleware())
+	router.Use(securityMiddleware(env))
 
-	if config.Environment != "development" {
-		rate, _ := limiter.NewRateFromFormatted("100-S")
+	if env != "development" {
+		rate, _ := limiter.NewRateFromFormatted(config.RateLimit)
 		store := memoryStore.NewStore()
 		rateMiddleware := ginLimiter.NewMiddleware(limiter.New(store, rate))
 		router.Use(rateMiddleware)
@@ -72,6 +74,7 @@ func New(config config.HttpServerConfig, db database.DatabaseInterface) HttpServ
 		},
 		config: config,
 		db:     db,
+		env:    env,
 	}
 
 	return server
@@ -115,35 +118,4 @@ func (s *httpServer) Shutdown(ctx context.Context) error {
 	s.db.Close()
 
 	return nil
-}
-
-func corsMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-
-		c.Next()
-	}
-}
-
-func logMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		start := time.Now()
-		c.Next()
-		latency := time.Since(start)
-
-		slog.Info(MsgHTTPRequest,
-			slog.String("method", c.Request.Method),
-			slog.String("path", c.Request.URL.Path),
-			slog.Int("status", c.Writer.Status()),
-			slog.String("client_ip", c.ClientIP()),
-			slog.Duration("latency", latency),
-		)
-	}
 }

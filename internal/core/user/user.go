@@ -31,7 +31,7 @@ func New(
 	}
 	if err := helpers.ValidateMinLength(name, 2, "name"); err != nil {
 		return nil, errors.Wrap(err, "validating minimum name length")
-	}
+	}	
 	if err := helpers.ValidateMaxLength(name, 100, "name"); err != nil {
 		return nil, errors.Wrap(err, "validating maximum name length")
 	}

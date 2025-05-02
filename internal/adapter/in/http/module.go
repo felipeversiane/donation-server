@@ -3,15 +3,17 @@ package http
 import (
 	"context"
 
+	"github.com/felipeversiane/donation-server/config"
 	"github.com/felipeversiane/donation-server/internal/adapter/out/database"
-	"github.com/felipeversiane/donation-server/internal/config"
 	"go.uber.org/fx"
 )
 
 var Module = fx.Options(
 	fx.Provide(
-		func(config config.HttpServerConfig, db database.DatabaseInterface) HttpServerInterface {
-			return New(config, db)
+		func(cfg config.ConfigInterface, db database.DatabaseInterface) HttpServerInterface {
+			config := cfg.GetHttpServerConfig()
+			environment := cfg.GetEnvironment()
+			return New(config, environment, db)
 		},
 	),
 	fx.Invoke(func(lc fx.Lifecycle, server HttpServerInterface) {
