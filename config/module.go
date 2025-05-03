@@ -23,8 +23,5 @@ var Module = fx.Options(
 		func(cfg ConfigInterface) SentryConfig {
 			return cfg.GetSentryConfig()
 		},
-		func(cfg ConfigInterface) string {
-			return cfg.GetEnvironment()
-		},
 	),
 )

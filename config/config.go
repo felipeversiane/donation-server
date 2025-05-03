@@ -14,7 +14,6 @@ var (
 )
 
 type Config struct {
-	Environment string            `env:"ENVIRONMENT" envDefault:"development"`
 	Log         LogConfig         `envPrefix:"LOG_"`
 	Database    DatabaseConfig    `envPrefix:"DB_"`
 	HttpServer  HttpServerConfig  `envPrefix:"HTTP_SERVER_"`
@@ -24,7 +23,6 @@ type Config struct {
 }
 
 type ConfigInterface interface {
-	GetEnvironment() string
 	GetDatabaseConfig() DatabaseConfig
 	GetHttpServerConfig() HttpServerConfig
 	GetJwtTokenConfig() JwtTokenConfig
@@ -56,6 +54,7 @@ type HttpServerConfig struct {
 	WriteTimeout int    `env:"WRITE_TIMEOUT" envDefault:"15"`
 	IdleTimeout  int    `env:"IDLE_TIMEOUT" envDefault:"60"`
 	RateLimit    string `env:"RATE_LIMIT" envDefault:"100-S"`
+	Environment  string `env:"ENVIRONMENT" envDefault:"development"`
 }
 
 type JwtTokenConfig struct {
@@ -85,10 +84,6 @@ func New() ConfigInterface {
 		}
 	})
 	return cfg
-}
-
-func (c *Config) GetEnvironment() string {
-	return c.Environment
 }
 
 func (c *Config) GetLogConfig() LogConfig {

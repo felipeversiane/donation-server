@@ -13,7 +13,6 @@ var Module = fx.Options(
 			return New(
 				cfg.GetHttpServerConfig(),
 				cfg.GetSentryConfig(),
-				cfg.GetEnvironment(),
 			)
 		},
 	),

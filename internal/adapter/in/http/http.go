@@ -31,7 +31,6 @@ const (
 type httpServer struct {
 	router *gin.Engine
 	srv    *http.Server
-	env    string
 	config config.HttpServerConfig
 }
 
@@ -44,11 +43,10 @@ type HttpServerInterface interface {
 func New(
 	httpConfig config.HttpServerConfig,
 	sentryConfig config.SentryConfig,
-	env string,
 ) HttpServerInterface {
-	setupGinMode(env)
-	setupSentry(sentryConfig, env)
-	router := setupRouter(env, httpConfig, sentryConfig)
+	setupGinMode(httpConfig.Environment)
+	setupSentry(sentryConfig, httpConfig.Environment)
+	router := setupRouter(httpConfig.Environment, httpConfig)
 
 	server := &httpServer{
 		router: router,
@@ -59,7 +57,6 @@ func New(
 			WriteTimeout: time.Duration(httpConfig.WriteTimeout) * time.Second,
 			IdleTimeout:  time.Duration(httpConfig.IdleTimeout) * time.Second,
 		},
-		env:    env,
 		config: httpConfig,
 	}
 
@@ -128,7 +125,7 @@ func setupSentry(sentryConfig config.SentryConfig, env string) {
 	}
 }
 
-func setupRouter(env string, httpConfig config.HttpServerConfig, sentryConfig config.SentryConfig) *gin.Engine {
+func setupRouter(env string, httpConfig config.HttpServerConfig) *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
