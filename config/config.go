@@ -15,6 +15,7 @@ var (
 
 type Config struct {
 	Environment string            `env:"ENVIRONMENT" envDefault:"development"`
+	Log         LogConfig         `envPrefix:"LOG_"`
 	Database    DatabaseConfig    `envPrefix:"DB_"`
 	HttpServer  HttpServerConfig  `envPrefix:"HTTP_SERVER_"`
 	JwtToken    JwtTokenConfig    `envPrefix:"JWT_"`
@@ -29,6 +30,12 @@ type ConfigInterface interface {
 	GetJwtTokenConfig() JwtTokenConfig
 	GetFileStorageConfig() FileStorageConfig
 	GetSentryConfig() SentryConfig
+	GetLogConfig() LogConfig
+}
+
+type LogConfig struct {
+	Level     string `env:"LEVEL" envDefault:"info"`
+	AddSource bool   `env:"ADD_SOURCE" envDefault:"false"`
 }
 
 type DatabaseConfig struct {
@@ -82,6 +89,10 @@ func New() ConfigInterface {
 
 func (c *Config) GetEnvironment() string {
 	return c.Environment
+}
+
+func (c *Config) GetLogConfig() LogConfig {
+	return c.Log
 }
 
 func (c *Config) GetDatabaseConfig() DatabaseConfig {

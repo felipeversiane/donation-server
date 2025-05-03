@@ -5,6 +5,9 @@ import "go.uber.org/fx"
 var Module = fx.Options(
 	fx.Provide(
 		New,
+		func(cfg ConfigInterface) LogConfig {
+			return cfg.GetLogConfig()
+		},
 		func(cfg ConfigInterface) DatabaseConfig {
 			return cfg.GetDatabaseConfig()
 		},
