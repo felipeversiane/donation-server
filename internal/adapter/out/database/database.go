@@ -36,8 +36,7 @@ func New(config config.DatabaseConfig) (DatabaseInterface, error) {
 
 		poolConfig, parseErr := pgxpool.ParseConfig(dsn)
 		if parseErr != nil {
-			err = fmt.Errorf("failed to parse pool config: %w", parseErr)
-			slog.Error("error parsing pool config", "error", err)
+			slog.Error("error parsing pool config", "error", parseErr)
 			return
 		}
 
@@ -49,8 +48,7 @@ func New(config config.DatabaseConfig) (DatabaseInterface, error) {
 
 		pool, connErr := pgxpool.NewWithConfig(context.Background(), poolConfig)
 		if connErr != nil {
-			err = fmt.Errorf("failed to create connection pool: %w", connErr)
-			slog.Error("error creating connection pool", "error", err)
+			slog.Error("error creating connection pool", "error", connErr)
 			return
 		}
 
@@ -63,7 +61,6 @@ func New(config config.DatabaseConfig) (DatabaseInterface, error) {
 
 		if err := instance.Ping(context.Background()); err != nil {
 			instance.Close()
-			err = fmt.Errorf("failed to connect to database: %w", err)
 			slog.Error("error connecting to database", "error", err)
 		} else {
 			slog.Info("database connection established successfully")
