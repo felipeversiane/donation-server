@@ -6,31 +6,33 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/felipeversiane/donation-server/config"
+	"github.com/gin-gonic/gin"
 	"github.com/ulule/limiter/v3"
+
+	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
+
 	ginLimiter "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
-
-	"github.com/felipeversiane/donation-server/config"
-	"github.com/felipeversiane/donation-server/internal/adapter/out/database"
-	"github.com/gin-gonic/gin"
 )
 
-var (
+const (
 	ErrPanicRecovered      = "panic recovered"
 	MsgStartingHTTPServer  = "starting HTTP server"
 	ErrServerFailedToStart = "server failed to start"
 	MsgInitiatingShutdown  = "initiating graceful shutdown"
 	ErrShutdownFailed      = "server shutdown failed"
 	MsgShutdownSuccessful  = "server shutdown completed successfully"
+	SentryInitError        = "error initializing sentry"
 	MsgHTTPRequest         = "HTTP request"
 )
 
 type httpServer struct {
 	router *gin.Engine
 	srv    *http.Server
-	config config.HttpServerConfig
-	db     database.DatabaseInterface
 	env    string
+	config config.HttpServerConfig
 }
 
 type HttpServerInterface interface {
@@ -39,42 +41,26 @@ type HttpServerInterface interface {
 	InitRoutes()
 }
 
-func New(config config.HttpServerConfig, env string, db database.DatabaseInterface) HttpServerInterface {
-	if env == "development" {
-		gin.SetMode(gin.DebugMode)
-	} else {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
-	router := gin.New()
-	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
-		slog.Error(ErrPanicRecovered, "error", recovered)
-		c.AbortWithStatus(http.StatusInternalServerError)
-	}))
-
-	router.Use(logMiddleware())
-	router.Use(corsMiddleware())
-	router.Use(securityMiddleware(env))
-
-	if env != "development" {
-		rate, _ := limiter.NewRateFromFormatted(config.RateLimit)
-		store := memoryStore.NewStore()
-		rateMiddleware := ginLimiter.NewMiddleware(limiter.New(store, rate))
-		router.Use(rateMiddleware)
-	}
+func New(
+	httpConfig config.HttpServerConfig,
+	sentryConfig config.SentryConfig,
+	env string,
+) HttpServerInterface {
+	setupGinMode(env)
+	setupSentry(sentryConfig, env)
+	router := setupRouter(env, httpConfig, sentryConfig)
 
 	server := &httpServer{
 		router: router,
 		srv: &http.Server{
-			Addr:         ":" + config.Port,
+			Addr:         ":" + httpConfig.Port,
 			Handler:      router,
-			ReadTimeout:  time.Duration(config.ReadTimeout) * time.Second,
-			WriteTimeout: time.Duration(config.WriteTimeout) * time.Second,
-			IdleTimeout:  time.Duration(config.IdleTimeout) * time.Second,
+			ReadTimeout:  time.Duration(httpConfig.ReadTimeout) * time.Second,
+			WriteTimeout: time.Duration(httpConfig.WriteTimeout) * time.Second,
+			IdleTimeout:  time.Duration(httpConfig.IdleTimeout) * time.Second,
 		},
-		config: config,
-		db:     db,
 		env:    env,
+		config: httpConfig,
 	}
 
 	return server
@@ -84,7 +70,7 @@ func (s *httpServer) InitRoutes() {
 	v1 := s.router.Group("/api/v1")
 	{
 		v1.GET("/health", func(ctx *gin.Context) {
-			ctx.JSON(200, gin.H{
+			ctx.JSON(http.StatusOK, gin.H{
 				"status":    "up",
 				"timestamp": time.Now().UTC().Format(time.RFC3339),
 			})
@@ -115,7 +101,51 @@ func (s *httpServer) Shutdown(ctx context.Context) error {
 	}
 
 	slog.Info(MsgShutdownSuccessful)
-	s.db.Close()
+	sentry.Flush(2 * time.Second)
 
 	return nil
+}
+
+func setupGinMode(env string) {
+	if env != "development" {
+		gin.SetMode(gin.ReleaseMode)
+		return
+	}
+	gin.SetMode(gin.DebugMode)
+}
+
+func setupSentry(sentryConfig config.SentryConfig, env string) {
+	if env == "development" {
+		return
+	}
+
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn:              sentryConfig.DSN,
+		EnableTracing:    true,
+		TracesSampleRate: sentryConfig.TracesSampleRate,
+	}); err != nil {
+		slog.Error(SentryInitError, "error", err)
+	}
+}
+
+func setupRouter(env string, httpConfig config.HttpServerConfig, sentryConfig config.SentryConfig) *gin.Engine {
+	router := gin.New()
+
+	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
+		slog.Error(ErrPanicRecovered, "error", recovered)
+		c.AbortWithStatus(500)
+	}))
+
+	router.Use(logMiddleware())
+	router.Use(corsMiddleware())
+	router.Use(securityMiddleware(env))
+	router.Use(sentrygin.New(sentrygin.Options{}))
+
+	if env != "development" {
+		rate, _ := limiter.NewRateFromFormatted(httpConfig.RateLimit)
+		store := memoryStore.NewStore()
+		router.Use(ginLimiter.NewMiddleware(limiter.New(store, rate)))
+	}
+
+	return router
 }
