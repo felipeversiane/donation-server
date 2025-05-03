@@ -3,7 +3,7 @@ package document
 import (
 	"time"
 
-	"github.com/felipeversiane/donation-server/pkg/helpers"
+	"github.com/felipeversiane/donation-server/pkg/helpers/str"
 	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
 	"github.com/pkg/errors"
 )
@@ -25,7 +25,7 @@ type Document struct {
 }
 
 func New(docTypeStr, value string, userID uuid.UUID) (*Document, error) {
-	docType := Type(helpers.CleanString(docTypeStr))
+	docType := Type(str.CleanString(docTypeStr))
 	if docType != CPF && docType != CNPJ {
 		return nil, errors.New("invalid document type")
 	}
@@ -34,7 +34,7 @@ func New(docTypeStr, value string, userID uuid.UUID) (*Document, error) {
 		return nil, errors.New("user_id is required")
 	}
 
-	cleanedValue := helpers.CleanString(value)
+	cleanedValue := str.CleanString(value)
 
 	if docType == CPF {
 		if len(cleanedValue) != 11 {
@@ -74,7 +74,7 @@ func (d *Document) IsValid() bool {
 }
 
 func (d *Document) Update(value string) error {
-	cleanedValue := helpers.CleanString(value)
+	cleanedValue := str.CleanString(value)
 
 	if d.Type == CPF {
 		if len(cleanedValue) != 11 {

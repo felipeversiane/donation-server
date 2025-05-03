@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/felipeversiane/donation-server/pkg/helpers"
+	"github.com/felipeversiane/donation-server/pkg/helpers/str"
 	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -236,7 +236,7 @@ func TestUpdate(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 
-				cleanedValue := helpers.CleanString(tt.newValue)
+				cleanedValue := str.CleanString(tt.newValue)
 				assert.Equal(t, cleanedValue, testDoc.Value)
 
 				if testDoc.Type == CPF {

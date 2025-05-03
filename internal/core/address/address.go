@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/felipeversiane/donation-server/pkg/helpers"
+	"github.com/felipeversiane/donation-server/pkg/helpers/field"
 	"github.com/felipeversiane/donation-server/pkg/vo/country"
 	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
 	"github.com/felipeversiane/donation-server/pkg/vo/zipcode"
@@ -40,7 +40,7 @@ func New(
 	}
 
 	for _, f := range requiredFields {
-		if err := helpers.ValidateRequired(f.value, f.field); err != nil {
+		if err := field.ValidateRequired(f.value, f.field); err != nil {
 			return nil, err
 		}
 	}
@@ -59,7 +59,7 @@ func New(
 	}
 
 	for _, f := range maxLengthChecks {
-		if err := helpers.ValidateMaxLength(f.value, f.limit, f.field); err != nil {
+		if err := field.ValidateMaxLength(f.value, f.limit, f.field); err != nil {
 			return nil, err
 		}
 	}

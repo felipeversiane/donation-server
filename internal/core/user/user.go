@@ -3,7 +3,7 @@ package user
 import (
 	"time"
 
-	"github.com/felipeversiane/donation-server/pkg/helpers"
+	"github.com/felipeversiane/donation-server/pkg/helpers/field"
 	"github.com/felipeversiane/donation-server/pkg/vo/email"
 	"github.com/felipeversiane/donation-server/pkg/vo/password"
 	"github.com/felipeversiane/donation-server/pkg/vo/phone"
@@ -26,17 +26,17 @@ type User struct {
 func New(
 	name, emailStr, passwordStr, phoneStr, avatar string,
 ) (*User, error) {
-	if err := helpers.ValidateRequired(name, "name"); err != nil {
+	if err := field.ValidateRequired(name, "name"); err != nil {
 		return nil, errors.Wrap(err, "validating name")
 	}
-	if err := helpers.ValidateMinLength(name, 2, "name"); err != nil {
+	if err := field.ValidateMinLength(name, 2, "name"); err != nil {
 		return nil, errors.Wrap(err, "validating minimum name length")
-	}	
-	if err := helpers.ValidateMaxLength(name, 100, "name"); err != nil {
+	}
+	if err := field.ValidateMaxLength(name, 100, "name"); err != nil {
 		return nil, errors.Wrap(err, "validating maximum name length")
 	}
 
-	if err := helpers.ValidateRequired(avatar, "avatar"); err != nil {
+	if err := field.ValidateRequired(avatar, "avatar"); err != nil {
 		return nil, errors.Wrap(err, "validating avatar")
 	}
 
@@ -75,16 +75,16 @@ func New(
 }
 
 func (u *User) Update(name, avatar string, phone phone.Phone) error {
-	if err := helpers.ValidateRequired(name, "name"); err != nil {
+	if err := field.ValidateRequired(name, "name"); err != nil {
 		return errors.Wrap(err, "validating name")
 	}
-	if err := helpers.ValidateMinLength(name, 2, "name"); err != nil {
+	if err := field.ValidateMinLength(name, 2, "name"); err != nil {
 		return errors.Wrap(err, "validating minimum name length")
 	}
-	if err := helpers.ValidateMaxLength(name, 100, "name"); err != nil {
+	if err := field.ValidateMaxLength(name, 100, "name"); err != nil {
 		return errors.Wrap(err, "validating maximum name length")
 	}
-	if err := helpers.ValidateRequired(avatar, "avatar"); err != nil {
+	if err := field.ValidateRequired(avatar, "avatar"); err != nil {
 		return errors.Wrap(err, "validating avatar")
 	}
 
