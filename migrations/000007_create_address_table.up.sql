@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS address (
     updated_at TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_address_postal_code ON address(zip_code);
+CREATE INDEX IF NOT EXISTS idx_address_zip_code ON address(zip_code);
 CREATE INDEX IF NOT EXISTS idx_address_city_id ON address(city_id);

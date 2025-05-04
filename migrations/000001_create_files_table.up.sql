@@ -10,4 +10,3 @@ CREATE TABLE IF NOT EXISTS files (
 );
 
 CREATE INDEX IF NOT EXISTS idx_files_type ON files(type);
-v
