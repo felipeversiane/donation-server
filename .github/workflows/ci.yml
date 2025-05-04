@@ -32,6 +32,10 @@ jobs:
       - name: Run the project
         run: make up
 
+      - name: Stop and remove containers
+        if: always()
+        run: make down
+
   lint:
     runs-on: ubuntu-22.04
     needs: build
