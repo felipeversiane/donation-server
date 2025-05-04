@@ -24,7 +24,7 @@ const (
 	MsgInitiatingShutdown  = "initiating graceful shutdown"
 	ErrShutdownFailed      = "server shutdown failed"
 	MsgShutdownSuccessful  = "server shutdown completed successfully"
-	SentryInitError        = "error initializing sentry"
+	ErrSentryInit          = "error initializing sentry"
 	MsgHTTPRequest         = "HTTP request"
 )
 
@@ -121,7 +121,7 @@ func setupSentry(sentryConfig config.SentryConfig, httpConfig config.HttpServerC
 		EnableTracing:    true,
 		TracesSampleRate: sentryConfig.TracesSampleRate,
 	}); err != nil {
-		slog.Error(SentryInitError, "error", err)
+		slog.Error(ErrSentryInit, "error", err)
 	}
 }
 

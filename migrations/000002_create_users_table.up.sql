@@ -1,10 +1,8 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    avatar VARCHAR,
+    avatar UUID REFERENCES files(id) ON DELETE SET NULL,
     role VARCHAR(20) NOT NULL,  
     type VARCHAR(20) NOT NULL,  
     created_at TIMESTAMP NOT NULL DEFAULT now(),
