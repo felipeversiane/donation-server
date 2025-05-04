@@ -1,23 +1,22 @@
-FROM golang:1.24.2-alpine3.20 AS builder
+FROM golang:1.21.3@sha256:b113af1e8b06f06a18ad41a6b331646dff587d7a4cf740f4852d16c49ed8ad73 AS base
+ENV GO111MODULE=on
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+ENV GOARCH=amd64
+WORKDIR /src
+COPY go.* .
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
-RUN apk add --no-cache upx ca-certificates tzdata
+FROM base AS build
 
-WORKDIR /app
+RUN --mount=target=. \
+    --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go build -ldflags="-w -s" -o /app/main ./cmd/go-template/*.go
 
-COPY go.mod go.sum ./
-RUN go mod download
 
-COPY . .
-
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o /app/server ./cmd/server/main.go
-RUN upx --best --lzma /app/server
-
-FROM alpine:3.19
-
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
-COPY --from=builder /app/server /server
-
-ENV TZ=UTC
-
-CMD ["/server"]
+FROM gcr.io/distroless/static:nonroot@sha256:91ca4720011393f4d4cab3a01fa5814ee2714b7d40e6c74f2505f74168398ca9 as prd
+COPY --link --from=build /app/main /
+USER 65532:65532
+ENTRYPOINT ["/main"]
