@@ -3,8 +3,8 @@ package address
 import (
 	"time"
 
-	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
-	"github.com/felipeversiane/donation-server/pkg/vo/zipcode"
+	"github.com/felipeversiane/donation-server/internal/core/vo/uuid"
+	"github.com/felipeversiane/donation-server/internal/core/vo/zipcode"
 )
 
 type Address struct {

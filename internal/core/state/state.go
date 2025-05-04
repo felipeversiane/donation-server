@@ -3,7 +3,7 @@ package state
 import (
 	"time"
 
-	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
+	"github.com/felipeversiane/donation-server/internal/core/vo/uuid"
 )
 
 type State struct {

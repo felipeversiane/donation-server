@@ -3,9 +3,9 @@ package user
 import (
 	"time"
 
-	"github.com/felipeversiane/donation-server/pkg/vo/email"
-	"github.com/felipeversiane/donation-server/pkg/vo/password"
-	"github.com/felipeversiane/donation-server/pkg/vo/uuid"
+	"github.com/felipeversiane/donation-server/internal/core/vo/email"
+	"github.com/felipeversiane/donation-server/internal/core/vo/password"
+	"github.com/felipeversiane/donation-server/internal/core/vo/uuid"
 )
 
 type User struct {
