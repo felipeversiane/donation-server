@@ -24,13 +24,13 @@ services:
       - DB_MAX_CONNECTIONS=20
       - DB_IDLE_CONNECTIONS=10
       - DB_CONN_MAX_LIFETIME=300
-      - ENVIRONMENT=development
+      - HTTP_SERVER_ENVIRONMENT=development
       - HTTP_SERVER_PORT=8000
       - HTTP_SERVER_READ_TIMEOUT=15
       - HTTP_SERVER_WRITE_TIMEOUT=15
       - HTTP_SERVER_IDLE_TIMEOUT=60
       - LOG_LEVEL=info
-      - LOG_PATH="./logs/app.log"
+      - LOG_ADD_SOURCE=false
       - JWT_SECRET_KEY="78931kas%&*#1i390dajs"
       - JWT_REFRESH_SECRET_KEY="98312jk#@SDAwseDA@sdj2s"
 
