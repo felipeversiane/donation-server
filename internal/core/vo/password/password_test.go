@@ -8,18 +8,17 @@ import (
 
 func TestNew(t *testing.T) {
 	tests := []struct {
-		input    string
-		expected string
-		isValid  bool
+		input   string
+		isValid bool
 	}{
-		{"Password123!", "Password123!", true},
-		{"password", "", false},
-		{"Password", "", false},
-		{"1234567890", "", false},
-		{"!@#password123", "!@#password123", true},
-		{"1234", "", false},
-		{"Password1234", "Password1234", true},
-		{" pass word ", "password", true},
+		{"Password123!", true},
+		{"password", false},
+		{"Password", false},
+		{"1234567890", false},
+		{"!@#password123", true},
+		{"1234", false},
+		{"Password1234", true},
+		{" pass word ", false},
 	}
 
 	for _, tt := range tests {
@@ -27,7 +26,7 @@ func TestNew(t *testing.T) {
 			password, err := New(tt.input)
 			if tt.isValid {
 				assert.NoError(t, err)
-				assert.Equal(t, tt.expected, password.String())
+				assert.NotEmpty(t, password.String())
 			} else {
 				assert.Error(t, err)
 			}

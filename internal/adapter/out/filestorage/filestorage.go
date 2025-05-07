@@ -25,7 +25,7 @@ type fileStorage struct {
 	mutex         sync.RWMutex
 }
 
-type FileStorageInterface interface {
+type Interface interface {
 	SaveFile(ctx context.Context, path string, content []byte) error
 	ReadFile(ctx context.Context, path string) ([]byte, error)
 	DeleteFile(ctx context.Context, path string) error
@@ -34,7 +34,7 @@ type FileStorageInterface interface {
 	Close()
 }
 
-func New(config config.FileStorageConfig) (FileStorageInterface, error) {
+func New(config config.FileStorageConfig) (Interface, error) {
 	var err error
 	once.Do(func() {
 		slog.Info("initializing local storage...")

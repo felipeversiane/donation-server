@@ -5,22 +5,22 @@ import "go.uber.org/fx"
 var Module = fx.Options(
 	fx.Provide(
 		New,
-		func(cfg ConfigInterface) LogConfig {
+		func(cfg Interface) LogConfig {
 			return cfg.GetLogConfig()
 		},
-		func(cfg ConfigInterface) DatabaseConfig {
+		func(cfg Interface) DatabaseConfig {
 			return cfg.GetDatabaseConfig()
 		},
-		func(cfg ConfigInterface) HttpServerConfig {
-			return cfg.GetHttpServerConfig()
+		func(cfg Interface) HTTPServerConfig {
+			return cfg.GetHTTPServerConfig()
 		},
-		func(cfg ConfigInterface) JwtTokenConfig {
+		func(cfg Interface) JwtTokenConfig {
 			return cfg.GetJwtTokenConfig()
 		},
-		func(cfg ConfigInterface) FileStorageConfig {
+		func(cfg Interface) FileStorageConfig {
 			return cfg.GetFileStorageConfig()
 		},
-		func(cfg ConfigInterface) SentryConfig {
+		func(cfg Interface) SentryConfig {
 			return cfg.GetSentryConfig()
 		},
 	),

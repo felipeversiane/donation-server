@@ -1,30 +1,22 @@
 package config
 
 import (
-	"log/slog"
-	"sync"
-
 	"github.com/caarlos0/env/v10"
 	"github.com/joho/godotenv"
 )
 
-var (
-	once sync.Once
-	cfg  *Config
-)
-
-type Config struct {
+type config struct {
 	Log         LogConfig         `envPrefix:"LOG_"`
 	Database    DatabaseConfig    `envPrefix:"DB_"`
-	HttpServer  HttpServerConfig  `envPrefix:"HTTP_SERVER_"`
+	HTTPServer  HTTPServerConfig  `envPrefix:"HTTP_SERVER_"`
 	JwtToken    JwtTokenConfig    `envPrefix:"JWT_"`
 	FileStorage FileStorageConfig `envPrefix:"FILE_STORAGE_"`
 	Sentry      SentryConfig      `envPrefix:"SENTRY_"`
 }
 
-type ConfigInterface interface {
+type Interface interface {
 	GetDatabaseConfig() DatabaseConfig
-	GetHttpServerConfig() HttpServerConfig
+	GetHTTPServerConfig() HTTPServerConfig
 	GetJwtTokenConfig() JwtTokenConfig
 	GetFileStorageConfig() FileStorageConfig
 	GetSentryConfig() SentryConfig
@@ -48,7 +40,7 @@ type DatabaseConfig struct {
 	ConnMaxLifetime int    `env:"CONN_MAX_LIFETIME" envDefault:"300"`
 }
 
-type HttpServerConfig struct {
+type HTTPServerConfig struct {
 	Port         string `env:"PORT" envDefault:"8000"`
 	ReadTimeout  int    `env:"READ_TIMEOUT" envDefault:"15"`
 	WriteTimeout int    `env:"WRITE_TIMEOUT" envDefault:"15"`
@@ -74,38 +66,36 @@ type SentryConfig struct {
 	TracesSampleRate float64 `env:"TRACES_SAMPLE_RATE" envDefault:"1.0"`
 }
 
-func New() ConfigInterface {
-	once.Do(func() {
-		_ = godotenv.Load()
+func New() (Interface, error) {
+	_ = godotenv.Load()
 
-		cfg = &Config{}
-		if err := env.Parse(cfg); err != nil {
-			slog.Error("error parsing config", "error", err)
-		}
-	})
-	return cfg
+	cfg := &config{}
+	if err := env.Parse(cfg); err != nil {
+		return nil, err
+	}
+	return cfg, nil
 }
 
-func (c *Config) GetLogConfig() LogConfig {
+func (c *config) GetLogConfig() LogConfig {
 	return c.Log
 }
 
-func (c *Config) GetDatabaseConfig() DatabaseConfig {
+func (c *config) GetDatabaseConfig() DatabaseConfig {
 	return c.Database
 }
 
-func (c *Config) GetHttpServerConfig() HttpServerConfig {
-	return c.HttpServer
+func (c *config) GetHTTPServerConfig() HTTPServerConfig {
+	return c.HTTPServer
 }
 
-func (c *Config) GetJwtTokenConfig() JwtTokenConfig {
+func (c *config) GetJwtTokenConfig() JwtTokenConfig {
 	return c.JwtToken
 }
 
-func (c *Config) GetFileStorageConfig() FileStorageConfig {
+func (c *config) GetFileStorageConfig() FileStorageConfig {
 	return c.FileStorage
 }
 
-func (c *Config) GetSentryConfig() SentryConfig {
+func (c *config) GetSentryConfig() SentryConfig {
 	return c.Sentry
 }

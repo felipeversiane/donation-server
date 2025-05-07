@@ -3,17 +3,18 @@ package filestorage
 import (
 	"context"
 
-	"github.com/felipeversiane/donation-server/config"
 	"go.uber.org/fx"
+
+	"github.com/felipeversiane/donation-server/config"
 )
 
 var Module = fx.Options(
 	fx.Provide(
-		func(config config.FileStorageConfig) (FileStorageInterface, error) {
+		func(config config.FileStorageConfig) (Interface, error) {
 			return New(config)
 		},
 	),
-	fx.Invoke(func(lc fx.Lifecycle, filestorage FileStorageInterface) {
+	fx.Invoke(func(lc fx.Lifecycle, filestorage Interface) {
 		lc.Append(fx.Hook{
 			OnStop: func(ctx context.Context) error {
 				filestorage.Close()

@@ -1,0 +1,70 @@
+run:
+  timeout: 3m
+  tests: true
+  fast: true
+  issues-exit-code: 1
+
+linters:
+  enable:
+    - asciicheck
+    - copyloopvar
+    - cyclop
+    - dogsled
+    - dupl
+    - errcheck
+    - errchkjson
+    - errorlint
+    - exhaustive
+    - forcetypeassert
+    - funlen
+    - gofmt
+    - goimports
+    - gosimple
+    - govet
+    - gosec
+    - ineffassign
+    - makezero
+    - misspell
+    - nakedret
+    - nestif
+    - nilerr
+    - noctx
+    - nolintlint
+    - prealloc
+    - promlinter
+    - revive
+    - rowserrcheck
+    - staticcheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/felipeversiane/donation-server
+
+  gocyclo:
+    min-complexity: 15
+
+  cyclop:
+    max-complexity: 10
+
+  funlen:
+    lines: 100
+    statements: 50
+
+  revive:
+    severity: warning
+    confidence: 0.8
+    rules:
+      - name: var-naming
+      - name: exported
+      - name: indent-error-flow
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gochecknoglobals
+        - gosec

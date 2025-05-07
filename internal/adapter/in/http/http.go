@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/felipeversiane/donation-server/config"
 	"github.com/gin-gonic/gin"
 	"github.com/ulule/limiter/v3"
 
@@ -15,6 +14,8 @@ import (
 
 	ginLimiter "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
+
+	"github.com/felipeversiane/donation-server/config"
 )
 
 const (
@@ -28,42 +29,42 @@ const (
 	MsgHTTPRequest         = "HTTP request"
 )
 
-type httpServer struct {
+type server struct {
 	router *gin.Engine
 	srv    *http.Server
-	config config.HttpServerConfig
+	config config.HTTPServerConfig
 }
 
-type HttpServerInterface interface {
+type ServerInterface interface {
 	Start() error
 	Shutdown(ctx context.Context) error
 	InitRoutes()
 }
 
 func New(
-	httpConfig config.HttpServerConfig,
+	serverConfig config.HTTPServerConfig,
 	sentryConfig config.SentryConfig,
-) HttpServerInterface {
-	setupGinMode(httpConfig)
-	setupSentry(sentryConfig, httpConfig)
-	router := setupRouter(httpConfig)
+) ServerInterface {
+	setupGinMode(serverConfig)
+	setupSentry(sentryConfig, serverConfig)
+	router := setupRouter(serverConfig)
 
-	server := &httpServer{
+	server := &server{
 		router: router,
 		srv: &http.Server{
-			Addr:         ":" + httpConfig.Port,
+			Addr:         ":" + serverConfig.Port,
 			Handler:      router,
-			ReadTimeout:  time.Duration(httpConfig.ReadTimeout) * time.Second,
-			WriteTimeout: time.Duration(httpConfig.WriteTimeout) * time.Second,
-			IdleTimeout:  time.Duration(httpConfig.IdleTimeout) * time.Second,
+			ReadTimeout:  time.Duration(serverConfig.ReadTimeout) * time.Second,
+			WriteTimeout: time.Duration(serverConfig.WriteTimeout) * time.Second,
+			IdleTimeout:  time.Duration(serverConfig.IdleTimeout) * time.Second,
 		},
-		config: httpConfig,
+		config: serverConfig,
 	}
 
 	return server
 }
 
-func (s *httpServer) InitRoutes() {
+func (s *server) InitRoutes() {
 	v1 := s.router.Group("/api/v1")
 	{
 		v1.GET("/health", func(ctx *gin.Context) {
@@ -75,7 +76,7 @@ func (s *httpServer) InitRoutes() {
 	}
 }
 
-func (s *httpServer) Start() error {
+func (s *server) Start() error {
 	slog.Info(MsgStartingHTTPServer, slog.String("port", s.config.Port))
 
 	if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -86,7 +87,7 @@ func (s *httpServer) Start() error {
 	return nil
 }
 
-func (s *httpServer) Shutdown(ctx context.Context) error {
+func (s *server) Shutdown(ctx context.Context) error {
 	slog.Info(MsgInitiatingShutdown)
 
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
@@ -103,7 +104,7 @@ func (s *httpServer) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func setupGinMode(httpConfig config.HttpServerConfig) {
+func setupGinMode(httpConfig config.HTTPServerConfig) {
 	if httpConfig.Environment != "development" {
 		gin.SetMode(gin.ReleaseMode)
 		return
@@ -111,8 +112,8 @@ func setupGinMode(httpConfig config.HttpServerConfig) {
 	gin.SetMode(gin.DebugMode)
 }
 
-func setupSentry(sentryConfig config.SentryConfig, httpConfig config.HttpServerConfig) {
-	if httpConfig.Environment == "development" {
+func setupSentry(sentryConfig config.SentryConfig, serverConfig config.HTTPServerConfig) {
+	if serverConfig.Environment == "development" {
 		return
 	}
 
@@ -125,7 +126,7 @@ func setupSentry(sentryConfig config.SentryConfig, httpConfig config.HttpServerC
 	}
 }
 
-func setupRouter(httpConfig config.HttpServerConfig) *gin.Engine {
+func setupRouter(serverConfig config.HTTPServerConfig) *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
@@ -135,11 +136,11 @@ func setupRouter(httpConfig config.HttpServerConfig) *gin.Engine {
 
 	router.Use(logMiddleware())
 	router.Use(corsMiddleware())
-	router.Use(securityMiddleware(httpConfig.Environment))
+	router.Use(securityMiddleware(serverConfig.Environment))
 	router.Use(sentrygin.New(sentrygin.Options{}))
 
-	if httpConfig.Environment != "development" {
-		rate, _ := limiter.NewRateFromFormatted(httpConfig.RateLimit)
+	if serverConfig.Environment != "development" {
+		rate, _ := limiter.NewRateFromFormatted(serverConfig.RateLimit)
 		store := memoryStore.NewStore()
 		router.Use(ginLimiter.NewMiddleware(limiter.New(store, rate)))
 	}

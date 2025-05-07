@@ -51,24 +51,49 @@ func (p Password) Equals(other Password) bool {
 }
 
 func isStrong(password string) bool {
-	var hasMinLen, hasUpper, hasLower, hasDigit, hasSpecial bool
+	return hasMinLength(password) &&
+		hasUppercase(password) &&
+		hasLowercase(password) &&
+		hasDigit(password) &&
+		hasSpecialChar(password)
+}
 
-	if len(password) >= 8 {
-		hasMinLen = true
-	}
+func hasMinLength(p string) bool {
+	return len(p) >= 8
+}
 
-	for _, ch := range password {
-		switch {
-		case unicode.IsUpper(ch):
-			hasUpper = true
-		case unicode.IsLower(ch):
-			hasLower = true
-		case unicode.IsDigit(ch):
-			hasDigit = true
-		case unicode.IsPunct(ch) || unicode.IsSymbol(ch):
-			hasSpecial = true
+func hasUppercase(p string) bool {
+	for _, ch := range p {
+		if unicode.IsUpper(ch) {
+			return true
 		}
 	}
+	return false
+}
 
-	return hasMinLen && hasUpper && hasLower && hasDigit && hasSpecial
+func hasLowercase(p string) bool {
+	for _, ch := range p {
+		if unicode.IsLower(ch) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasDigit(p string) bool {
+	for _, ch := range p {
+		if unicode.IsDigit(ch) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasSpecialChar(p string) bool {
+	for _, ch := range p {
+		if unicode.IsPunct(ch) || unicode.IsSymbol(ch) {
+			return true
+		}
+	}
+	return false
 }

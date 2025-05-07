@@ -3,20 +3,21 @@ package http
 import (
 	"context"
 
-	"github.com/felipeversiane/donation-server/config"
 	"go.uber.org/fx"
+
+	"github.com/felipeversiane/donation-server/config"
 )
 
 var Module = fx.Options(
 	fx.Provide(
-		func(cfg config.ConfigInterface) HttpServerInterface {
+		func(cfg config.Interface) ServerInterface {
 			return New(
-				cfg.GetHttpServerConfig(),
+				cfg.GetHTTPServerConfig(),
 				cfg.GetSentryConfig(),
 			)
 		},
 	),
-	fx.Invoke(func(lc fx.Lifecycle, server HttpServerInterface) {
+	fx.Invoke(func(lc fx.Lifecycle, server ServerInterface) {
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
 				go func() {

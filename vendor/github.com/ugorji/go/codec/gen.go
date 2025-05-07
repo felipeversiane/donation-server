@@ -24,6 +24,7 @@ import (
 	"sync"
 	"text/template"
 	"time"
+
 	// "ugorji.net/zz"
 	"unicode"
 	"unicode/utf8"
@@ -194,8 +195,8 @@ var (
 	// ie ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_
 	//
 	// don't use numbers, as a valid go identifer must start with a letter.
-	genTypenameEnc  = base32.NewEncoding("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef")
-	genQNameRegex = regexp.MustCompile(`[A-Za-z_.]+`)
+	genTypenameEnc = base32.NewEncoding("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef")
+	genQNameRegex  = regexp.MustCompile(`[A-Za-z_.]+`)
 )
 
 type genBuf struct {

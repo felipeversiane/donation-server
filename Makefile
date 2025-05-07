@@ -30,7 +30,7 @@ prune:
 	docker system prune -af --volumes
 
 lint:
-	golangci-lint run --config .golangci.toml
+	golangci-lint run --config .golangci.yml
 
 govulncheck: 
 	@go run golang.org/x/vuln/cmd/govulncheck ./...
