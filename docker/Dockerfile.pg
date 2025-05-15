@@ -1,0 +1,28 @@
+FROM postgres:16-bullseye
+
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  git \
+  postgresql-server-dev-16 \
+  cron \
+  gnupg \
+  && rm -rf /var/lib/apt/lists/* \
+  && git clone --branch v0.6.0 https://github.com/pgvector/pgvector.git \
+  && cd pgvector && make && make install \
+  && rm -rf /pgvector \
+  && mkdir -p /backups \
+  && chown -R postgres:postgres /backups
+
+RUN echo 'CREATE EXTENSION IF NOT EXISTS vector;' > /docker-entrypoint-initdb.d/init.sql
+
+COPY docker/backup.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/backup.sh
+
+RUN echo "0 0 * * * postgres BACKUP_PASSWORD=\${BACKUP_PASSWORD} /usr/local/bin/backup.sh >> /backups/backup.log 2>&1" > /etc/cron.d/postgres-backup \
+  && chmod 0644 /etc/cron.d/postgres-backup
+
+RUN echo '#!/bin/bash\nservice cron start\nexec docker-entrypoint.sh "$@"' > /docker-entrypoint.sh \
+  && chmod +x /docker-entrypoint.sh
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["postgres"] 
