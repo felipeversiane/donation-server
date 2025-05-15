@@ -1,0 +1,95 @@
+name: donation-server
+
+services:
+  db:
+    image: postgres:16-alpine
+    env_file: .env
+    container_name: donation-server-db
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_SSL=${DB_SSL}
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -d ${DB_NAME} -U ${DB_USER} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3  
+      start_period: 20s
+
+  migrator:
+    image: migrate/migrate
+    container_name: donation-server-migrator
+    volumes:
+      - ./migrations:/migrations
+    command: [
+      "-path", "/migrations",
+      "-database", 
+      "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}",
+      "up"
+    ]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+
+  server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    env_file: .env
+    container_name: donation-server
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    networks:
+      - default
+    ports:
+      - "8000:8000"
+
+  db_ui:
+    image: sosedoff/pgweb:0.13.1
+    container_name: donation-server-pgadmin
+    environment:
+      - PGWEB_DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    networks:
+      - default
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"        
+      - "9001:9001"        
+    environment:
+      MINIO_ROOT_USER: ${FILE_STORAGE_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${FILE_STORAGE_SECRET_KEY}
+    volumes:
+      - ./data:/data
+    command: server /data --console-address ":9001"
+
+volumes:
+  local_postgres_data: {}
+ 
+
+networks:
+  default:
+    driver: bridge

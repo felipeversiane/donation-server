@@ -6,22 +6,22 @@ var Module = fx.Options(
 	fx.Provide(
 		New,
 		func(cfg Interface) LogConfig {
-			return cfg.GetLogConfig()
+			return cfg.LogConfig()
 		},
 		func(cfg Interface) DatabaseConfig {
-			return cfg.GetDatabaseConfig()
+			return cfg.DatabaseConfig()
 		},
 		func(cfg Interface) HTTPServerConfig {
-			return cfg.GetHTTPServerConfig()
+			return cfg.HTTPServerConfig()
 		},
 		func(cfg Interface) JwtTokenConfig {
-			return cfg.GetJwtTokenConfig()
+			return cfg.JwtTokenConfig()
 		},
 		func(cfg Interface) FileStorageConfig {
-			return cfg.GetFileStorageConfig()
+			return cfg.FileStorageConfig()
 		},
 		func(cfg Interface) SentryConfig {
-			return cfg.GetSentryConfig()
+			return cfg.SentryConfig()
 		},
 	),
 )

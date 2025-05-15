@@ -15,12 +15,12 @@ type config struct {
 }
 
 type Interface interface {
-	GetDatabaseConfig() DatabaseConfig
-	GetHTTPServerConfig() HTTPServerConfig
-	GetJwtTokenConfig() JwtTokenConfig
-	GetFileStorageConfig() FileStorageConfig
-	GetSentryConfig() SentryConfig
-	GetLogConfig() LogConfig
+	DatabaseConfig() DatabaseConfig
+	HTTPServerConfig() HTTPServerConfig
+	JwtTokenConfig() JwtTokenConfig
+	FileStorageConfig() FileStorageConfig
+	SentryConfig() SentryConfig
+	LogConfig() LogConfig
 }
 
 type LogConfig struct {
@@ -55,10 +55,13 @@ type JwtTokenConfig struct {
 }
 
 type FileStorageConfig struct {
-	BasePath             string `env:"PATH" envDefault:"./uploads"`
-	MaxSize              int64  `env:"MAX_SIZE" envDefault:"5242880"`
-	FilePermissions      uint32 `env:"FILE_PERMISSIONS" envDefault:"0644"`
-	DirectoryPermissions uint32 `env:"DIRECTORY_PERMISSIONS" envDefault:"0755"`
+	AccessKey string `env:"FILE_STORAGE_ACCESS_KEY" envDefault:"admin"`
+	SecretKey string `env:"FILE_STORAGE_SECRET_KEY" envDefault:"admin"`
+	Endpoint  string `env:"FILE_STORAGE_ENDPOINT" envDefault:"http://localhost:9000"`
+	Region    string `env:"FILE_STORAGE_REGION" envDefault:"us-east-1"`
+	Bucket    string `env:"FILE_STORAGE_BUCKET" envDefault:"donation-storage"`
+	ACL       string `env:"FILE_STORAGE_ACL" envDefault:"public-read"`
+	URL       string `env:"FILE_STORAGE_URL" envDefault:"http://localhost:9000/donation-storage"`
 }
 
 type SentryConfig struct {
@@ -76,26 +79,26 @@ func New() (Interface, error) {
 	return cfg, nil
 }
 
-func (c *config) GetLogConfig() LogConfig {
+func (c *config) LogConfig() LogConfig {
 	return c.Log
 }
 
-func (c *config) GetDatabaseConfig() DatabaseConfig {
+func (c *config) DatabaseConfig() DatabaseConfig {
 	return c.Database
 }
 
-func (c *config) GetHTTPServerConfig() HTTPServerConfig {
+func (c *config) HTTPServerConfig() HTTPServerConfig {
 	return c.HTTPServer
 }
 
-func (c *config) GetJwtTokenConfig() JwtTokenConfig {
+func (c *config) JwtTokenConfig() JwtTokenConfig {
 	return c.JwtToken
 }
 
-func (c *config) GetFileStorageConfig() FileStorageConfig {
+func (c *config) FileStorageConfig() FileStorageConfig {
 	return c.FileStorage
 }
 
-func (c *config) GetSentryConfig() SentryConfig {
+func (c *config) SentryConfig() SentryConfig {
 	return c.Sentry
 }

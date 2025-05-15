@@ -3,13 +3,13 @@ module github.com/felipeversiane/donation-server
 go 1.24.2
 
 require (
+	github.com/aws/aws-sdk-go v1.55.7
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/getsentry/sentry-go/gin v0.32.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/joho/godotenv v1.5.1
-	github.com/pariz/gountries v0.1.6
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/ulule/limiter/v3 v3.11.2
@@ -18,17 +18,8 @@ require (
 )
 
 require (
-	github.com/go-logr/logr v1.4.2 // indirect
-	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2 // indirect
-	github.com/kr/text v0.2.0 // indirect
-	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
-	go.opentelemetry.io/otel v1.35.0 // indirect
-	go.opentelemetry.io/otel/metric v1.35.0 // indirect
-	go.opentelemetry.io/otel/trace v1.35.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250428153025-10db94c68c34 // indirect
-	google.golang.org/grpc v1.72.0 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 )
 
 require (

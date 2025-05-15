@@ -1,4 +1,4 @@
-DOCKER_COMPOSE_FILE=docker-compose.local.yml
+DOCKER_COMPOSE_FILE=docker-compose.yml
 
 .PHONY: build up start stop down logs ps restart prune
 

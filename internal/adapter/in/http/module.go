@@ -12,8 +12,8 @@ var Module = fx.Options(
 	fx.Provide(
 		func(cfg config.Interface) ServerInterface {
 			return New(
-				cfg.GetHTTPServerConfig(),
-				cfg.GetSentryConfig(),
+				cfg.HTTPServerConfig(),
+				cfg.SentryConfig(),
 			)
 		},
 	),

@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/felipeversiane/donation-server/config"
 	"github.com/felipeversiane/donation-server/internal/adapter/in/http"
-	"github.com/felipeversiane/donation-server/internal/infra/database"
+	"github.com/felipeversiane/donation-server/internal/provider/database"
 
 	"go.uber.org/fx"
 )
