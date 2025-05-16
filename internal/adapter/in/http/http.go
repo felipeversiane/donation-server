@@ -42,23 +42,23 @@ type ServerInterface interface {
 }
 
 func New(
-	serverConfig config.HTTPServerConfig,
+	httpConfig config.HTTPServerConfig,
 	sentryConfig config.SentryConfig,
 ) ServerInterface {
-	setupGinMode(serverConfig)
-	setupSentry(sentryConfig, serverConfig)
-	router := setupRouter(serverConfig)
+	setupGinMode(httpConfig)
+	setupSentry(sentryConfig, httpConfig)
+	router := setupRouter(httpConfig)
 
 	server := &server{
 		router: router,
 		srv: &http.Server{
-			Addr:         ":" + serverConfig.Port,
+			Addr:         ":" + httpConfig.Port,
 			Handler:      router,
-			ReadTimeout:  time.Duration(serverConfig.ReadTimeout) * time.Second,
-			WriteTimeout: time.Duration(serverConfig.WriteTimeout) * time.Second,
-			IdleTimeout:  time.Duration(serverConfig.IdleTimeout) * time.Second,
+			ReadTimeout:  time.Duration(httpConfig.ReadTimeout) * time.Second,
+			WriteTimeout: time.Duration(httpConfig.WriteTimeout) * time.Second,
+			IdleTimeout:  time.Duration(httpConfig.IdleTimeout) * time.Second,
 		},
-		config: serverConfig,
+		config: httpConfig,
 	}
 
 	return server
@@ -112,8 +112,8 @@ func setupGinMode(httpConfig config.HTTPServerConfig) {
 	gin.SetMode(gin.DebugMode)
 }
 
-func setupSentry(sentryConfig config.SentryConfig, serverConfig config.HTTPServerConfig) {
-	if serverConfig.Environment == "development" {
+func setupSentry(sentryConfig config.SentryConfig, httpConfig config.HTTPServerConfig) {
+	if httpConfig.Environment == "development" {
 		return
 	}
 
@@ -126,7 +126,7 @@ func setupSentry(sentryConfig config.SentryConfig, serverConfig config.HTTPServe
 	}
 }
 
-func setupRouter(serverConfig config.HTTPServerConfig) *gin.Engine {
+func setupRouter(httpConfig config.HTTPServerConfig) *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
@@ -136,11 +136,11 @@ func setupRouter(serverConfig config.HTTPServerConfig) *gin.Engine {
 
 	router.Use(logMiddleware())
 	router.Use(corsMiddleware())
-	router.Use(securityMiddleware(serverConfig.Environment))
+	router.Use(securityMiddleware(httpConfig.Environment))
 	router.Use(sentrygin.New(sentrygin.Options{}))
 
-	if serverConfig.Environment != "development" {
-		rate, _ := limiter.NewRateFromFormatted(serverConfig.RateLimit)
+	if httpConfig.Environment != "development" {
+		rate, _ := limiter.NewRateFromFormatted(httpConfig.RateLimit)
 		store := memoryStore.NewStore()
 		router.Use(ginLimiter.NewMiddleware(limiter.New(store, rate)))
 	}

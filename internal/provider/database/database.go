@@ -8,7 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/felipeversiane/donation-server/pkg/helpers/number"
+	"github.com/felipeversiane/donation-server/pkg/helper/number"
 
 	"github.com/felipeversiane/donation-server/config"
 )
