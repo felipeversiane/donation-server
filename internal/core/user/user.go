@@ -6,6 +6,7 @@ import (
 	"github.com/felipeversiane/donation-server/internal/core/vo/email"
 	"github.com/felipeversiane/donation-server/internal/core/vo/password"
 	"github.com/felipeversiane/donation-server/internal/core/vo/role"
+	"github.com/felipeversiane/donation-server/internal/core/vo/usertype"
 	"github.com/felipeversiane/donation-server/internal/core/vo/uuid"
 )
 
@@ -15,13 +16,18 @@ type User struct {
 	Password  password.Password `json:"-"`
 	AvatarID  *uuid.UUID        `json:"avatar_id,omitempty"`
 	Role      role.Role         `json:"role"`
-	Type      string            `json:"type"`
+	Type      usertype.UserType `json:"type"`
 	CreatedAt time.Time         `json:"created_at"`
 	UpdatedAt time.Time         `json:"updated_at"`
 }
 
-func New(emailStr, passwordStr, roleStr, userType string, avatarID *uuid.UUID) (*User, error) {
+func New(emailStr, passwordStr, roleStr, userTypeStr string, avatarID *uuid.UUID) (*User, error) {
 	id, err := uuid.New()
+	if err != nil {
+		return nil, err
+	}
+
+	userTypeVO, err := usertype.New(userTypeStr)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +55,7 @@ func New(emailStr, passwordStr, roleStr, userType string, avatarID *uuid.UUID) (
 		Password:  passwordVO,
 		AvatarID:  avatarID,
 		Role:      roleVO,
-		Type:      userType,
+		Type:      userTypeVO,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}, nil

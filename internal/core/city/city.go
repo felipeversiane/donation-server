@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/felipeversiane/donation-server/internal/core/vo/uuid"
+	"github.com/felipeversiane/donation-server/pkg/field"
 )
 
 type City struct {
@@ -15,6 +16,16 @@ type City struct {
 }
 
 func New(name string, stateID *uuid.UUID) (*City, error) {
+	if err := field.ValidateRequired(name, "name"); err != nil {
+		return nil, err
+	}
+	if err := field.ValidateMinLength(name, 2, "name"); err != nil {
+		return nil, err
+	}
+	if err := field.ValidateMaxLength(name, 100, "name"); err != nil {
+		return nil, err
+	}
+
 	id, err := uuid.New()
 	if err != nil {
 		return nil, err

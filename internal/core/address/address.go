@@ -5,6 +5,7 @@ import (
 
 	"github.com/felipeversiane/donation-server/internal/core/vo/uuid"
 	"github.com/felipeversiane/donation-server/internal/core/vo/zipcode"
+	"github.com/felipeversiane/donation-server/pkg/field"
 )
 
 type Address struct {
@@ -21,11 +22,25 @@ type Address struct {
 }
 
 func New(zipCodeStr, neighborhood, street, number, complement string, userID, cityID uuid.UUID) (*Address, error) {
-	id, err := uuid.New()
+	if err := field.ValidateRequired(zipCodeStr, "zip code"); err != nil {
+		return nil, err
+	}
+	if err := field.ValidateRequired(neighborhood, "neighborhood"); err != nil {
+		return nil, err
+	}
+	if err := field.ValidateRequired(street, "street"); err != nil {
+		return nil, err
+	}
+	if err := field.ValidateRequired(number, "number"); err != nil {
+		return nil, err
+	}
+
+	zipCodeVO, err := zipcode.New(zipCodeStr)
 	if err != nil {
 		return nil, err
 	}
-	zipCodeVO, err := zipcode.New(zipCodeStr)
+
+	id, err := uuid.New()
 	if err != nil {
 		return nil, err
 	}
