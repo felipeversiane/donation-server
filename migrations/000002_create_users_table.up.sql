@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     avatar UUID REFERENCES files(id) ON DELETE SET NULL,
-    role VARCHAR(20) NOT NULL,  
+    role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'user')),  
     type VARCHAR(20) NOT NULL,  
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP NOT NULL DEFAULT now()

@@ -20,12 +20,12 @@ type Address struct {
 	UpdatedAt    time.Time       `json:"updated_at"`
 }
 
-func New(zipCode, neighborhood, street, number, complement string, userID, cityID uuid.UUID) (*Address, error) {
+func New(zipCodeStr, neighborhood, street, number, complement string, userID, cityID uuid.UUID) (*Address, error) {
 	id, err := uuid.New()
 	if err != nil {
 		return nil, err
 	}
-	zip, err := zipcode.New(zipCode)
+	zipCodeVO, err := zipcode.New(zipCodeStr)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func New(zipCode, neighborhood, street, number, complement string, userID, cityI
 
 	return &Address{
 		ID:           id,
-		ZipCode:      zip,
+		ZipCode:      zipCodeVO,
 		Neighborhood: neighborhood,
 		Street:       street,
 		Number:       number,

@@ -5,6 +5,7 @@ import (
 
 	"github.com/felipeversiane/donation-server/internal/core/vo/email"
 	"github.com/felipeversiane/donation-server/internal/core/vo/password"
+	"github.com/felipeversiane/donation-server/internal/core/vo/role"
 	"github.com/felipeversiane/donation-server/internal/core/vo/uuid"
 )
 
@@ -13,24 +14,29 @@ type User struct {
 	Email     email.Email       `json:"email"`
 	Password  password.Password `json:"-"`
 	AvatarID  *uuid.UUID        `json:"avatar_id,omitempty"`
-	Role      string            `json:"role"`
+	Role      role.Role         `json:"role"`
 	Type      string            `json:"type"`
 	CreatedAt time.Time         `json:"created_at"`
 	UpdatedAt time.Time         `json:"updated_at"`
 }
 
-func New(emailStr, passwordStr, role, userType string, avatarID *uuid.UUID) (*User, error) {
+func New(emailStr, passwordStr, roleStr, userType string, avatarID *uuid.UUID) (*User, error) {
 	id, err := uuid.New()
 	if err != nil {
 		return nil, err
 	}
 
-	email, err := email.New(emailStr)
+	emailVO, err := email.New(emailStr)
 	if err != nil {
 		return nil, err
 	}
 
-	password, err := password.New(passwordStr)
+	passwordVO, err := password.New(passwordStr)
+	if err != nil {
+		return nil, err
+	}
+
+	roleVO, err := role.New(roleStr)
 	if err != nil {
 		return nil, err
 	}
@@ -39,10 +45,10 @@ func New(emailStr, passwordStr, role, userType string, avatarID *uuid.UUID) (*Us
 
 	return &User{
 		ID:        id,
-		Email:     email,
-		Password:  password,
+		Email:     emailVO,
+		Password:  passwordVO,
 		AvatarID:  avatarID,
-		Role:      role,
+		Role:      roleVO,
 		Type:      userType,
 		CreatedAt: now,
 		UpdatedAt: now,
