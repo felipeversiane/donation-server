@@ -11,14 +11,15 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID         `json:"id"`
-	Email     email.Email       `json:"email"`
-	Password  password.Password `json:"-"`
-	AvatarID  *uuid.UUID        `json:"avatar_id,omitempty"`
-	Role      role.Role         `json:"role"`
-	Type      usertype.UserType `json:"type"`
-	CreatedAt time.Time         `json:"created_at"`
-	UpdatedAt time.Time         `json:"updated_at"`
+	ID        uuid.UUID
+	Email     email.Email
+	Password  password.Password
+	AvatarID  *uuid.UUID
+	Role      role.Role
+	Type      usertype.UserType
+	IsActive  bool
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func New(emailStr, passwordStr, roleStr, userTypeStr string, avatarID *uuid.UUID) (*User, error) {
@@ -56,6 +57,7 @@ func New(emailStr, passwordStr, roleStr, userTypeStr string, avatarID *uuid.UUID
 		AvatarID:  avatarID,
 		Role:      roleVO,
 		Type:      userTypeVO,
+		IsActive:  false,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}, nil

@@ -9,12 +9,12 @@ import (
 )
 
 type File struct {
-	ID        uuid.UUID         `json:"id"`
-	Name      string            `json:"name"`
-	URL       string            `json:"url"`
-	Type      filetype.FileType `json:"type"`
-	CreatedAt time.Time         `json:"created_at"`
-	UpdatedAt time.Time         `json:"updated_at"`
+	ID        uuid.UUID
+	Name      string
+	URL       string
+	Type      filetype.FileType
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func New(name, url, fileTypeStr string) (*File, error) {

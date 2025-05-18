@@ -8,12 +8,12 @@ import (
 )
 
 type State struct {
-	ID        uuid.UUID  `json:"id"`
-	Name      string     `json:"name"`
-	UF        string     `json:"uf"`
-	CountryID *uuid.UUID `json:"country_id,omitempty"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	ID        uuid.UUID
+	Name      string
+	UF        string
+	CountryID *uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func New(name, uf string, countryID *uuid.UUID) (*State, error) {

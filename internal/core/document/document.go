@@ -12,12 +12,12 @@ import (
 )
 
 type Document struct {
-	ID        uuid.UUID                 `json:"id"`
-	Value     string                    `json:"value"`
-	Type      documenttype.DocumentType `json:"type"`
-	UserID    uuid.UUID                 `json:"user_id"`
-	CreatedAt time.Time                 `json:"created_at"`
-	UpdatedAt time.Time                 `json:"updated_at"`
+	ID        uuid.UUID
+	Value     string
+	Type      documenttype.DocumentType
+	UserID    uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func New(value string, docType string, userID uuid.UUID) (*Document, error) {

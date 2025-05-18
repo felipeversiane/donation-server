@@ -9,16 +9,16 @@ import (
 )
 
 type Address struct {
-	ID           uuid.UUID       `json:"id"`
-	ZipCode      zipcode.ZipCode `json:"zip_code"`
-	Neighborhood string          `json:"neighborhood"`
-	Street       string          `json:"street"`
-	Number       string          `json:"number,omitempty"`
-	Complement   string          `json:"complement,omitempty"`
-	UserID       uuid.UUID       `json:"user_id,omitempty"`
-	CityID       uuid.UUID       `json:"city_id"`
-	CreatedAt    time.Time       `json:"created_at"`
-	UpdatedAt    time.Time       `json:"updated_at"`
+	ID           uuid.UUID
+	ZipCode      zipcode.ZipCode
+	Neighborhood string
+	Street       string
+	Number       string
+	Complement   string
+	UserID       uuid.UUID
+	CityID       uuid.UUID
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 func New(zipCodeStr, neighborhood, street, number, complement string, userID, cityID uuid.UUID) (*Address, error) {

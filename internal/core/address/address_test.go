@@ -14,6 +14,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name         string
 		zipCode      string
+		expectedZip  string
 		neighborhood string
 		street       string
 		number       string
@@ -23,6 +24,7 @@ func TestNew(t *testing.T) {
 		{
 			name:         "valid address",
 			zipCode:      "74000-000",
+			expectedZip:  "74000000",
 			neighborhood: "Centro",
 			street:       "Rua 1",
 			number:       "123",
@@ -32,6 +34,7 @@ func TestNew(t *testing.T) {
 		{
 			name:         "empty zip code",
 			zipCode:      "",
+			expectedZip:  "",
 			neighborhood: "Centro",
 			street:       "Rua 1",
 			number:       "123",
@@ -40,6 +43,7 @@ func TestNew(t *testing.T) {
 		{
 			name:         "invalid zip code format",
 			zipCode:      "ABC123",
+			expectedZip:  "",
 			neighborhood: "Centro",
 			street:       "Rua 1",
 			number:       "123",
@@ -48,6 +52,7 @@ func TestNew(t *testing.T) {
 		{
 			name:         "missing neighborhood",
 			zipCode:      "74000-000",
+			expectedZip:  "",
 			neighborhood: "",
 			street:       "Rua 1",
 			number:       "123",
@@ -56,6 +61,7 @@ func TestNew(t *testing.T) {
 		{
 			name:         "missing street",
 			zipCode:      "74000-000",
+			expectedZip:  "",
 			neighborhood: "Centro",
 			street:       "",
 			number:       "123",
@@ -64,6 +70,7 @@ func TestNew(t *testing.T) {
 		{
 			name:         "missing number",
 			zipCode:      "74000-000",
+			expectedZip:  "",
 			neighborhood: "Centro",
 			street:       "Rua 1",
 			number:       "",
@@ -81,7 +88,7 @@ func TestNew(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, addr)
-				assert.Equal(t, tt.zipCode, addr.ZipCode.String())
+				assert.Equal(t, tt.expectedZip, addr.ZipCode.String())
 			}
 		})
 	}

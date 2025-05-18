@@ -8,11 +8,11 @@ import (
 )
 
 type City struct {
-	ID        uuid.UUID  `json:"id"`
-	Name      string     `json:"name"`
-	StateID   *uuid.UUID `json:"state_id,omitempty"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	ID        uuid.UUID
+	Name      string
+	StateID   *uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func New(name string, stateID *uuid.UUID) (*City, error) {
