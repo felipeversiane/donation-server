@@ -3,7 +3,7 @@ package document
 import (
 	"testing"
 
-	"github.com/felipeversiane/donation-server/internal/core/vo/uuid"
+	"github.com/felipeversiane/donation-server/pkg/uuid"
 	"github.com/stretchr/testify/assert"
 )
 

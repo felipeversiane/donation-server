@@ -12,10 +12,13 @@ import (
 	"github.com/getsentry/sentry-go"
 	sentrygin "github.com/getsentry/sentry-go/gin"
 
+	"github.com/felipeversiane/donation-server/config"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	ginLimiter "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
-
-	"github.com/felipeversiane/donation-server/config"
 )
 
 const (
@@ -67,12 +70,24 @@ func New(
 func (s *server) InitRoutes() {
 	v1 := s.router.Group("/api/v1")
 	{
+		// @Summary Health Check
+		// @Description Returns the status of the server
+		// @Tags Health
+		// @Produce json
+		// @Success 200 {object} map[string]interface{}
+		// @Router /api/v1/health [get]
 		v1.GET("/health", func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{
 				"status":    "up",
 				"timestamp": time.Now().UTC().Format(time.RFC3339),
 			})
 		})
+		swagger := v1.Group("/swagger")
+		if s.config.Environment != "development" {
+			swagger.Use(swaggerAuthMiddleware(s.config.SwaggerUser, s.config.SwaggerPassword))
+		}
+		swagger.GET("/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	}
 }
 

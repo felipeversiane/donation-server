@@ -7,7 +7,7 @@ import (
 	"github.com/felipeversiane/donation-server/internal/core/vo/password"
 	"github.com/felipeversiane/donation-server/internal/core/vo/role"
 	"github.com/felipeversiane/donation-server/internal/core/vo/usertype"
-	"github.com/felipeversiane/donation-server/internal/core/vo/uuid"
+	"github.com/felipeversiane/donation-server/pkg/uuid"
 )
 
 type User struct {

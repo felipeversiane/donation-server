@@ -60,3 +60,10 @@ func securityMiddleware(env string) gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func swaggerAuthMiddleware(user, password string) gin.HandlerFunc {
+	accounts := gin.Accounts{
+		user: password,
+	}
+	return gin.BasicAuth(accounts)
+}

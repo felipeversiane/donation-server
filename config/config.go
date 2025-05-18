@@ -47,6 +47,9 @@ type HTTPServerConfig struct {
 	IdleTimeout  int    `env:"IDLE_TIMEOUT" envDefault:"60"`
 	RateLimit    string `env:"RATE_LIMIT" envDefault:"100-S"`
 	Environment  string `env:"ENVIRONMENT" envDefault:"development"`
+	SwaggerUser string `env:"SWAGGER_USER", envDefault:"admin"`
+	SwaggerPassword string `env:"SWAGGER_PASSWORD", envDefault:"admin123"`
+
 }
 
 type JwtTokenConfig struct {

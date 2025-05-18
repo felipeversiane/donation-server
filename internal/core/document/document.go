@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/felipeversiane/donation-server/internal/core/vo/documenttype"
-	"github.com/felipeversiane/donation-server/internal/core/vo/uuid"
 	"github.com/felipeversiane/donation-server/pkg/field"
 	"github.com/felipeversiane/donation-server/pkg/str"
+	"github.com/felipeversiane/donation-server/pkg/uuid"
 )
 
 type Document struct {
