@@ -26,3 +26,5 @@ go.work
 tmp
 
 data
+
+app.log
