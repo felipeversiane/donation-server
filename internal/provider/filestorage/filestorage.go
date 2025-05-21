@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -20,6 +21,7 @@ type Interface interface {
 	Client() *s3.S3
 	Bucket() string
 	URL() string
+	CreateBucket() error
 }
 
 func New(cfg config.FileStorageConfig) (Interface, error) {
@@ -58,4 +60,33 @@ func (f *fileStorage) Bucket() string {
 
 func (f *fileStorage) URL() string {
 	return f.config.URL
+}
+
+func (f *fileStorage) CreateBucket() error {
+	client := f.Client()
+	bucket := f.Bucket()
+
+	_, err := client.HeadBucket(&s3.HeadBucketInput{
+		Bucket: aws.String(bucket),
+	})
+
+	if err == nil {
+		slog.Info("bucket already exists", "bucket", bucket)
+		return nil
+	}
+
+	if aerr, ok := err.(awserr.Error); ok && aerr.Code() == "NotFound" {
+		slog.Warn("bucket not found, creating", "bucket", bucket)
+		_, err = client.CreateBucket(&s3.CreateBucketInput{
+			Bucket: aws.String(bucket),
+		})
+		if err != nil {
+			slog.Error("failed to create bucket", "bucket", bucket, "error", err)
+			return fmt.Errorf("failed to create bucket %s: %w", bucket, err)
+		}
+		slog.Info("bucket created successfully", "bucket", bucket)
+		return nil
+	}
+
+	return fmt.Errorf("error checking bucket existence: %w", err)
 }

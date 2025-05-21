@@ -1,4 +1,4 @@
-// @title Donation Server
+// @title Donation API
 // @version 1.0
 // @description RESTful API to receive donations via pix or credit/debit card.
 // @host localhost:8000

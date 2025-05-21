@@ -14,6 +14,9 @@ var Module = fx.Options(
 	}),
 	fx.Invoke(func(lc fx.Lifecycle, fs Interface) {
 		lc.Append(fx.Hook{
+			OnStart: func(ctx context.Context) error {
+				return fs.CreateBucket()
+			},
 			OnStop: func(ctx context.Context) error {
 				return nil
 			},
