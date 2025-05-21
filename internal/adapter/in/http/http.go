@@ -19,6 +19,8 @@ import (
 
 	ginLimiter "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	memoryStore "github.com/ulule/limiter/v3/drivers/store/memory"
+
+	_ "github.com/felipeversiane/donation-server/docs"
 )
 
 const (

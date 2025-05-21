@@ -1,7 +1,7 @@
 // @title Donation Server
 // @version 1.0
 // @description RESTful API to receive donations via pix or credit/debit card.
-// @host localhost:8080
+// @host localhost:8000
 // @BasePath /api/v1
 // @schemes http
 package main
@@ -19,7 +19,6 @@ func main() {
 		config.Module,
 		database.Module,
 		http.Module,
-		fx.NopLogger,
 	)
 
 	app.Run()
