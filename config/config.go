@@ -24,8 +24,9 @@ type Interface interface {
 }
 
 type LogConfig struct {
-	Level     string `env:"LEVEL" envDefault:"info"`
-	AddSource bool   `env:"ADD_SOURCE" envDefault:"false"`
+	Level  string `env:"LOG_LEVEL" default:"info"`
+	Path   string `env:"LOG_PATH" default:"logs/app.log"`
+	Stdout bool   `env:"LOG_STDOUT" default:"true"`
 }
 
 type DatabaseConfig struct {
@@ -41,15 +42,14 @@ type DatabaseConfig struct {
 }
 
 type HTTPServerConfig struct {
-	Port         string `env:"PORT" envDefault:"8000"`
-	ReadTimeout  int    `env:"READ_TIMEOUT" envDefault:"15"`
-	WriteTimeout int    `env:"WRITE_TIMEOUT" envDefault:"15"`
-	IdleTimeout  int    `env:"IDLE_TIMEOUT" envDefault:"60"`
-	RateLimit    string `env:"RATE_LIMIT" envDefault:"100-S"`
-	Environment  string `env:"ENVIRONMENT" envDefault:"development"`
-	SwaggerUser string `env:"SWAGGER_USER", envDefault:"admin"`
+	Port            string `env:"PORT" envDefault:"8000"`
+	ReadTimeout     int    `env:"READ_TIMEOUT" envDefault:"15"`
+	WriteTimeout    int    `env:"WRITE_TIMEOUT" envDefault:"15"`
+	IdleTimeout     int    `env:"IDLE_TIMEOUT" envDefault:"60"`
+	RateLimit       string `env:"RATE_LIMIT" envDefault:"100-S"`
+	Environment     string `env:"ENVIRONMENT" envDefault:"development"`
+	SwaggerUser     string `env:"SWAGGER_USER", envDefault:"admin"`
 	SwaggerPassword string `env:"SWAGGER_PASSWORD", envDefault:"admin123"`
-
 }
 
 type JwtTokenConfig struct {
