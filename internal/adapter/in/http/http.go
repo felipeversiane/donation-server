@@ -9,9 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ulule/limiter/v3"
 
-	"github.com/getsentry/sentry-go"
-	sentrygin "github.com/getsentry/sentry-go/gin"
-
 	"github.com/felipeversiane/donation-server/config"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -30,7 +27,6 @@ const (
 	MsgInitiatingShutdown  = "initiating graceful shutdown"
 	ErrShutdownFailed      = "server shutdown failed"
 	MsgShutdownSuccessful  = "server shutdown completed successfully"
-	ErrSentryInit          = "error initializing sentry"
 	MsgHTTPRequest         = "HTTP request"
 )
 
@@ -48,10 +44,8 @@ type ServerInterface interface {
 
 func New(
 	httpConfig config.HTTPServerConfig,
-	sentryConfig config.SentryConfig,
 ) ServerInterface {
 	setupGinMode(httpConfig)
-	setupSentry(sentryConfig, httpConfig)
 	router := setupRouter(httpConfig)
 
 	server := &server{
@@ -116,7 +110,6 @@ func (s *server) Shutdown(ctx context.Context) error {
 	}
 
 	slog.Info(MsgShutdownSuccessful)
-	sentry.Flush(2 * time.Second)
 
 	return nil
 }
@@ -127,20 +120,6 @@ func setupGinMode(httpConfig config.HTTPServerConfig) {
 		return
 	}
 	gin.SetMode(gin.DebugMode)
-}
-
-func setupSentry(sentryConfig config.SentryConfig, httpConfig config.HTTPServerConfig) {
-	if httpConfig.Environment == "development" {
-		return
-	}
-
-	if err := sentry.Init(sentry.ClientOptions{
-		Dsn:              sentryConfig.DSN,
-		EnableTracing:    true,
-		TracesSampleRate: sentryConfig.TracesSampleRate,
-	}); err != nil {
-		slog.Error(ErrSentryInit, "error", err)
-	}
 }
 
 func setupRouter(httpConfig config.HTTPServerConfig) *gin.Engine {
@@ -154,7 +133,6 @@ func setupRouter(httpConfig config.HTTPServerConfig) *gin.Engine {
 	router.Use(logMiddleware())
 	router.Use(corsMiddleware())
 	router.Use(securityMiddleware(httpConfig.Environment))
-	router.Use(sentrygin.New(sentrygin.Options{}))
 
 	if httpConfig.Environment != "development" {
 		rate, _ := limiter.NewRateFromFormatted(httpConfig.RateLimit)

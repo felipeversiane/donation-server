@@ -20,8 +20,5 @@ var Module = fx.Options(
 		func(cfg Interface) FileStorageConfig {
 			return cfg.FileStorageConfig()
 		},
-		func(cfg Interface) SentryConfig {
-			return cfg.SentryConfig()
-		},
 	),
 )

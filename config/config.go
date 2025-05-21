@@ -11,7 +11,6 @@ type config struct {
 	HTTPServer  HTTPServerConfig  `envPrefix:"HTTP_SERVER_"`
 	JwtToken    JwtTokenConfig    `envPrefix:"JWT_"`
 	FileStorage FileStorageConfig `envPrefix:"FILE_STORAGE_"`
-	Sentry      SentryConfig      `envPrefix:"SENTRY_"`
 }
 
 type Interface interface {
@@ -19,7 +18,6 @@ type Interface interface {
 	HTTPServerConfig() HTTPServerConfig
 	JwtTokenConfig() JwtTokenConfig
 	FileStorageConfig() FileStorageConfig
-	SentryConfig() SentryConfig
 	LogConfig() LogConfig
 }
 
@@ -67,11 +65,6 @@ type FileStorageConfig struct {
 	URL       string `env:"FILE_STORAGE_URL" envDefault:"http://localhost:9000/donation-storage"`
 }
 
-type SentryConfig struct {
-	DSN              string  `env:"DSN"`
-	TracesSampleRate float64 `env:"TRACES_SAMPLE_RATE" envDefault:"1.0"`
-}
-
 func New() (Interface, error) {
 	_ = godotenv.Load()
 
@@ -100,8 +93,4 @@ func (c *config) JwtTokenConfig() JwtTokenConfig {
 
 func (c *config) FileStorageConfig() FileStorageConfig {
 	return c.FileStorage
-}
-
-func (c *config) SentryConfig() SentryConfig {
-	return c.Sentry
 }
