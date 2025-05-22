@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/felipeversiane/donation-server/config"
-	"github.com/natefinch/lumberjack/v3"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type logger struct {
