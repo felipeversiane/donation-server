@@ -6,12 +6,13 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/felipeversiane/donation-server/config"
+	"github.com/felipeversiane/donation-server/pkg/logger"
 )
 
 var Module = fx.Options(
 	fx.Provide(
-		func(config config.DatabaseConfig) (Interface, error) {
-			return New(config)
+		func(cfg config.DatabaseConfig, log logger.Interface) (Interface, error) {
+			return New(cfg, log)
 		},
 	),
 	fx.Invoke(func(lc fx.Lifecycle, db Interface) {

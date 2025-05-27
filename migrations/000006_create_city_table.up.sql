@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS city (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY NOT NULL,
     name VARCHAR(100) NOT NULL,
     state_id UUID REFERENCES state(id) ON DELETE SET NULL,
     created_at TIMESTAMP NOT NULL DEFAULT now(),

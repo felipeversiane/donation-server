@@ -2,14 +2,13 @@ package http
 
 import (
 	"context"
-	"log/slog"
 	"net/http"
 	"time"
 
+	"github.com/felipeversiane/donation-server/config"
+	"github.com/felipeversiane/donation-server/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/ulule/limiter/v3"
-
-	"github.com/felipeversiane/donation-server/config"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -34,6 +33,7 @@ type server struct {
 	router *gin.Engine
 	srv    *http.Server
 	config config.HTTPServerConfig
+	logger logger.Interface
 }
 
 type ServerInterface interface {
@@ -44,9 +44,10 @@ type ServerInterface interface {
 
 func New(
 	httpConfig config.HTTPServerConfig,
+	logger logger.Interface,
 ) ServerInterface {
 	setupGinMode(httpConfig)
-	router := setupRouter(httpConfig)
+	router := setupRouter(httpConfig, logger)
 
 	server := &server{
 		router: router,
@@ -58,6 +59,7 @@ func New(
 			IdleTimeout:  time.Duration(httpConfig.IdleTimeout) * time.Second,
 		},
 		config: httpConfig,
+		logger: logger,
 	}
 
 	return server
@@ -66,32 +68,20 @@ func New(
 func (s *server) InitRoutes() {
 	v1 := s.router.Group("/api/v1")
 	{
-		// @Summary Health Check
-		// @Description Returns the status of the server
-		// @Tags Health
-		// @Produce json
-		// @Success 200 {object} map[string]interface{}
-		// @Router /api/v1/health [get]
-		v1.GET("/health", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{
-				"status":    "up",
-				"timestamp": time.Now().UTC().Format(time.RFC3339),
-			})
-		})
+		v1.GET("/health", HealthCheck)
 		swagger := v1.Group("/swagger")
 		if s.config.Environment != "development" {
 			swagger.Use(swaggerAuthMiddleware(s.config.SwaggerUser, s.config.SwaggerPassword))
 		}
 		swagger.GET("/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
 	}
 }
 
 func (s *server) Start() error {
-	slog.Info(MsgStartingHTTPServer, slog.String("port", s.config.Port))
+	s.logger.Logger().Info(MsgStartingHTTPServer, "port", s.config.Port)
 
 	if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		slog.Error(ErrServerFailedToStart, "error", err)
+		s.logger.Logger().Error(ErrServerFailedToStart, "error", err)
 		return err
 	}
 
@@ -99,18 +89,17 @@ func (s *server) Start() error {
 }
 
 func (s *server) Shutdown(ctx context.Context) error {
-	slog.Info(MsgInitiatingShutdown)
+	s.logger.Logger().Info(MsgInitiatingShutdown)
 
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	if err := s.srv.Shutdown(ctx); err != nil {
-		slog.Error(ErrShutdownFailed, "error", err)
+		s.logger.Logger().Error(ErrShutdownFailed, "error", err)
 		return err
 	}
 
-	slog.Info(MsgShutdownSuccessful)
-
+	s.logger.Logger().Info(MsgShutdownSuccessful)
 	return nil
 }
 
@@ -122,11 +111,11 @@ func setupGinMode(httpConfig config.HTTPServerConfig) {
 	gin.SetMode(gin.DebugMode)
 }
 
-func setupRouter(httpConfig config.HTTPServerConfig) *gin.Engine {
+func setupRouter(httpConfig config.HTTPServerConfig, logger logger.Interface) *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
-		slog.Error(ErrPanicRecovered, "error", recovered)
+		logger.Logger().Error(ErrPanicRecovered, "error", recovered)
 		c.AbortWithStatus(500)
 	}))
 
@@ -141,4 +130,18 @@ func setupRouter(httpConfig config.HTTPServerConfig) *gin.Engine {
 	}
 
 	return router
+}
+
+// HealthCheck godoc
+// @Summary Health Check
+// @Description Returns the status of the server
+// @Tags Health
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /api/v1/health [get]
+func HealthCheck(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"status":    "up",
+		"timestamp": time.Now().UTC().Format(time.RFC3339),
+	})
 }

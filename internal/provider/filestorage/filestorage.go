@@ -2,7 +2,6 @@ package filestorage
 
 import (
 	"fmt"
-	"log/slog"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -10,11 +9,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/felipeversiane/donation-server/config"
+	"github.com/felipeversiane/donation-server/pkg/logger"
 )
 
 type fileStorage struct {
 	client *s3.S3
 	config config.FileStorageConfig
+	logger logger.Interface
 }
 
 type Interface interface {
@@ -24,8 +25,8 @@ type Interface interface {
 	CreateBucket() error
 }
 
-func New(cfg config.FileStorageConfig) (Interface, error) {
-	slog.Info("initializing file storage connection...")
+func New(cfg config.FileStorageConfig, logger logger.Interface) (Interface, error) {
+	logger.Logger().Info("initializing file storage connection...")
 
 	sess, err := session.NewSession(&aws.Config{
 		Region:           aws.String(cfg.Region),
@@ -34,7 +35,7 @@ func New(cfg config.FileStorageConfig) (Interface, error) {
 		S3ForcePathStyle: aws.Bool(true),
 	})
 	if err != nil {
-		slog.Info("unable to create S3 session", "error", err)
+		logger.Logger().Error("unable to create S3 session", "error", err)
 		return nil, fmt.Errorf("unable to create S3 session: %w", err)
 	}
 
@@ -43,9 +44,10 @@ func New(cfg config.FileStorageConfig) (Interface, error) {
 	fs := &fileStorage{
 		client: client,
 		config: cfg,
+		logger: logger,
 	}
 
-	slog.Info("file storage initialized successfully")
+	logger.Logger().Info("file storage initialized successfully")
 
 	return fs, nil
 }
@@ -71,20 +73,20 @@ func (f *fileStorage) CreateBucket() error {
 	})
 
 	if err == nil {
-		slog.Info("bucket already exists", "bucket", bucket)
+		f.logger.Logger().Info("bucket already exists", "bucket", bucket)
 		return nil
 	}
 
 	if aerr, ok := err.(awserr.Error); ok && aerr.Code() == "NotFound" {
-		slog.Warn("bucket not found, creating", "bucket", bucket)
+		f.logger.Logger().Warn("bucket not found, creating", "bucket", bucket)
 		_, err = client.CreateBucket(&s3.CreateBucketInput{
 			Bucket: aws.String(bucket),
 		})
 		if err != nil {
-			slog.Error("failed to create bucket", "bucket", bucket, "error", err)
+			f.logger.Logger().Error("failed to create bucket", "bucket", bucket, "error", err)
 			return fmt.Errorf("failed to create bucket %s: %w", bucket, err)
 		}
-		slog.Info("bucket created successfully", "bucket", bucket)
+		f.logger.Logger().Info("bucket created successfully", "bucket", bucket)
 		return nil
 	}
 

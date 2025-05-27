@@ -1,4 +1,25 @@
+basePath: /api/v1
+host: localhost:8000
 info:
   contact: {}
-paths: {}
+  description: RESTful API to receive donations via pix or credit/debit card.
+  title: Donation API
+  version: "1.0"
+paths:
+  /api/v1/health:
+    get:
+      description: Returns the status of the server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health Check
+      tags:
+      - Health
+schemes:
+- http
 swagger: "2.0"
