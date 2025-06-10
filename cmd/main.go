@@ -20,6 +20,7 @@ func main() {
 		logger.Module,
 		database.Module,
 		http.Module,
+		fx.NopLogger,
 	)
 
 	app.Run()

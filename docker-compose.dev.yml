@@ -48,6 +48,7 @@ services:
     container_name: donation-server
     volumes:
       - .:/app
+      - ./logs:/logs         
     restart: unless-stopped
     depends_on:
       migrator:
