@@ -2,13 +2,12 @@ package str
 
 import (
 	"strings"
-	"unicode"
 )
 
 func CleanString(value string) string {
 	var b strings.Builder
 	for _, r := range value {
-		if unicode.IsDigit(r) {
+		if r >= '0' && r <= '9' {
 			b.WriteRune(r)
 		}
 	}
