@@ -12,7 +12,7 @@ import (
 var Module = fx.Options(
 	fx.Provide(
 		func(cfg config.Interface, log logger.Interface) ServerInterface {
-			return New(cfg.HTTPServerConfig(), log)
+			return New(cfg.HTTPServer(), log)
 		},
 	),
 	fx.Invoke(func(lc fx.Lifecycle, server ServerInterface) {

@@ -14,7 +14,7 @@ import (
 
 type fileStorage struct {
 	client *s3.S3
-	config config.FileStorageConfig
+	config config.FileStorage
 	logger logger.Interface
 }
 
@@ -25,7 +25,7 @@ type Interface interface {
 	CreateBucket() error
 }
 
-func New(cfg config.FileStorageConfig, logger logger.Interface) (Interface, error) {
+func New(cfg config.FileStorage, logger logger.Interface) (Interface, error) {
 	logger.Logger().Info("initializing file storage connection...")
 
 	sess, err := session.NewSession(&aws.Config{

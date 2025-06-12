@@ -32,7 +32,7 @@ const (
 type server struct {
 	router *gin.Engine
 	srv    *http.Server
-	config config.HTTPServerConfig
+	config config.HTTPServer
 	logger logger.Interface
 }
 
@@ -43,7 +43,7 @@ type ServerInterface interface {
 }
 
 func New(
-	httpConfig config.HTTPServerConfig,
+	httpConfig config.HTTPServer,
 	logger logger.Interface,
 ) ServerInterface {
 	setupGinMode(httpConfig)
@@ -103,7 +103,7 @@ func (s *server) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func setupGinMode(httpConfig config.HTTPServerConfig) {
+func setupGinMode(httpConfig config.HTTPServer) {
 	if httpConfig.Environment != "development" {
 		gin.SetMode(gin.ReleaseMode)
 		return
@@ -111,7 +111,7 @@ func setupGinMode(httpConfig config.HTTPServerConfig) {
 	gin.SetMode(gin.DebugMode)
 }
 
-func setupRouter(httpConfig config.HTTPServerConfig, logger logger.Interface) *gin.Engine {
+func setupRouter(httpConfig config.HTTPServer, logger logger.Interface) *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {

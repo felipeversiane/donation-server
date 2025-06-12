@@ -6,7 +6,7 @@ import (
 )
 
 var Module = fx.Options(
-	fx.Provide(func(cfg config.LogConfig) Interface {
+	fx.Provide(func(cfg config.Log) Interface {
 		return New(cfg)
 	}),
 )

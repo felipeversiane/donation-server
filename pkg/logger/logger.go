@@ -19,7 +19,7 @@ type Interface interface {
 	WithContext(ctx context.Context) *slog.Logger
 }
 
-func New(config config.LogConfig) Interface {
+func New(config config.Log) Interface {
 	var level slog.Level
 	switch config.Level {
 	case "debug":

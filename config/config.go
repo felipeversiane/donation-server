@@ -6,28 +6,28 @@ import (
 )
 
 type config struct {
-	Log         LogConfig         `envPrefix:"LOG_"`
-	Database    DatabaseConfig    `envPrefix:"DB_"`
-	HTTPServer  HTTPServerConfig  `envPrefix:"HTTP_SERVER_"`
-	JwtToken    JwtTokenConfig    `envPrefix:"JWT_"`
-	FileStorage FileStorageConfig `envPrefix:"FILE_STORAGE_"`
+	Log         Log         `envPrefix:"LOG_"`
+	Database    Database    `envPrefix:"DB_"`
+	HTTPServer  HTTPServer  `envPrefix:"HTTP_SERVER_"`
+	JwtToken    JwtToken    `envPrefix:"JWT_"`
+	FileStorage FileStorage `envPrefix:"FILE_STORAGE_"`
 }
 
 type Interface interface {
-	DatabaseConfig() DatabaseConfig
-	HTTPServerConfig() HTTPServerConfig
-	JwtTokenConfig() JwtTokenConfig
-	FileStorageConfig() FileStorageConfig
-	LogConfig() LogConfig
+	Database() Database
+	HTTPServer() HTTPServer
+	JwtToken() JwtToken
+	FileStorage() FileStorage
+	Log() Log
 }
 
-type LogConfig struct {
+type Log struct {
 	Level  string `env:"LOG_LEVEL" default:"info"`
 	Path   string `env:"LOG_PATH" default:"logs/app.log"`
 	Stdout bool   `env:"LOG_STDOUT" default:"true"`
 }
 
-type DatabaseConfig struct {
+type Database struct {
 	Host            string `env:"HOST" envDefault:"localhost"`
 	Port            string `env:"PORT" envDefault:"5432"`
 	User            string `env:"USER" envDefault:"user"`
@@ -39,23 +39,23 @@ type DatabaseConfig struct {
 	ConnMaxLifetime int    `env:"CONN_MAX_LIFETIME" envDefault:"300"`
 }
 
-type HTTPServerConfig struct {
+type HTTPServer struct {
 	Port            string `env:"PORT" envDefault:"8000"`
 	ReadTimeout     int    `env:"READ_TIMEOUT" envDefault:"15"`
 	WriteTimeout    int    `env:"WRITE_TIMEOUT" envDefault:"15"`
 	IdleTimeout     int    `env:"IDLE_TIMEOUT" envDefault:"60"`
 	RateLimit       string `env:"RATE_LIMIT" envDefault:"100-S"`
 	Environment     string `env:"ENVIRONMENT" envDefault:"development"`
-	SwaggerUser     string `env:"SWAGGER_USER", envDefault:"admin"`
-	SwaggerPassword string `env:"SWAGGER_PASSWORD", envDefault:"admin123"`
+	SwaggerUser     string `env:"SWAGGER_USER" envDefault:"admin"`
+	SwaggerPassword string `env:"SWAGGER_PASSWORD" envDefault:"admin123"`
 }
 
-type JwtTokenConfig struct {
+type JwtToken struct {
 	SecretKey        string `env:"SECRET_KEY" envDefault:"3891aSDk23aSDa3j#@sd"`
 	SecretRefreshKey string `env:"REFRESH_SECRET_KEY" envDefault:"h3i12iaSD32u98da@#%aisd"`
 }
 
-type FileStorageConfig struct {
+type FileStorage struct {
 	AccessKey string `env:"FILE_STORAGE_ACCESS_KEY" envDefault:"admin"`
 	SecretKey string `env:"FILE_STORAGE_SECRET_KEY" envDefault:"admin"`
 	Endpoint  string `env:"FILE_STORAGE_ENDPOINT" envDefault:"http://localhost:9000"`
@@ -75,22 +75,22 @@ func New() (Interface, error) {
 	return cfg, nil
 }
 
-func (c *config) LogConfig() LogConfig {
+func (c *config) Log() Log {
 	return c.Log
 }
 
-func (c *config) DatabaseConfig() DatabaseConfig {
+func (c *config) Database() Database {
 	return c.Database
 }
 
-func (c *config) HTTPServerConfig() HTTPServerConfig {
+func (c *config) HTTPServer() HTTPServer {
 	return c.HTTPServer
 }
 
-func (c *config) JwtTokenConfig() JwtTokenConfig {
+func (c *config) JwtToken() JwtToken {
 	return c.JwtToken
 }
 
-func (c *config) FileStorageConfig() FileStorageConfig {
+func (c *config) FileStorage() FileStorage {
 	return c.FileStorage
 }
