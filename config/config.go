@@ -6,11 +6,11 @@ import (
 )
 
 type config struct {
-	Log         Log         `envPrefix:"LOG_"`
-	Database    Database    `envPrefix:"DB_"`
-	HTTPServer  HTTPServer  `envPrefix:"HTTP_SERVER_"`
-	JwtToken    JwtToken    `envPrefix:"JWT_"`
-	FileStorage FileStorage `envPrefix:"FILE_STORAGE_"`
+	LogCfg         Log         `envPrefix:"LOG_"`
+	DatabaseCfg    Database    `envPrefix:"DB_"`
+	HTTPServerCfg  HTTPServer  `envPrefix:"HTTP_SERVER_"`
+	JwtTokenCfg    JwtToken    `envPrefix:"JWT_"`
+	FileStorageCfg FileStorage `envPrefix:"FILE_STORAGE_"`
 }
 
 type Interface interface {
@@ -76,21 +76,21 @@ func New() (Interface, error) {
 }
 
 func (c *config) Log() Log {
-	return c.Log
+	return c.LogCfg
 }
 
 func (c *config) Database() Database {
-	return c.Database
+	return c.DatabaseCfg
 }
 
 func (c *config) HTTPServer() HTTPServer {
-	return c.HTTPServer
+	return c.HTTPServerCfg
 }
 
 func (c *config) JwtToken() JwtToken {
-	return c.JwtToken
+	return c.JwtTokenCfg
 }
 
 func (c *config) FileStorage() FileStorage {
-	return c.FileStorage
+	return c.FileStorageCfg
 }
