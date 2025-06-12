@@ -1,4 +1,4 @@
-DOCKER_COMPOSE_FILE=docker-compose.yml
+DOCKER_COMPOSE_FILE ?= docker-compose.local.yml
 
 .PHONY: build up start stop down logs ps restart prune
 
@@ -39,4 +39,5 @@ setup:
 	@git config core.hooksPath .githooks
 
 test:
-	go test ./... -v
+        go test ./... -v
+
