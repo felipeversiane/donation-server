@@ -22,9 +22,9 @@ type Interface interface {
 }
 
 type Log struct {
-	Level  string `env:"LOG_LEVEL" default:"info"`
-	Path   string `env:"LOG_PATH" default:"logs/app.log"`
-	Stdout bool   `env:"LOG_STDOUT" default:"true"`
+	Level  string `env:"LEVEL" envDefault:"info"`
+	Path   string `env:"PATH" envDefault:"logs/app.log"`
+	Stdout bool   `env:"STDOUT" envDefault:"true"`
 }
 
 type Database struct {
