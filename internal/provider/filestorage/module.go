@@ -10,7 +10,7 @@ import (
 )
 
 var Module = fx.Options(
-	fx.Provide(func(cfg config.FileStorageConfig, log logger.Interface) (Interface, error) {
+	fx.Provide(func(cfg config.FileStorage, log logger.Interface) (Interface, error) {
 		return New(cfg, log)
 	}),
 	fx.Invoke(func(lc fx.Lifecycle, fs Interface) {

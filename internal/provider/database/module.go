@@ -11,7 +11,7 @@ import (
 
 var Module = fx.Options(
 	fx.Provide(
-		func(cfg config.DatabaseConfig, log logger.Interface) (Interface, error) {
+		func(cfg config.Database, log logger.Interface) (Interface, error) {
 			return New(cfg, log)
 		},
 	),

@@ -14,7 +14,7 @@ import (
 
 type database struct {
 	pool   *pgxpool.Pool
-	config config.DatabaseConfig
+	config config.Database
 	logger logger.Interface
 }
 
@@ -24,7 +24,7 @@ type Interface interface {
 	Close()
 }
 
-func New(config config.DatabaseConfig, logger logger.Interface) (Interface, error) {
+func New(config config.Database, logger logger.Interface) (Interface, error) {
 	logger.Logger().Info("initializing database connection...")
 	dsn := getConnectionString(config)
 
@@ -96,7 +96,7 @@ func (d *database) Pool() *pgxpool.Pool {
 	return d.pool
 }
 
-func getConnectionString(config config.DatabaseConfig) string {
+func getConnectionString(config config.Database) string {
 	return fmt.Sprintf("user=%s password=%s dbname=%s port=%s host=%s sslmode=%s",
 		config.User,
 		config.Password,
