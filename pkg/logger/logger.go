@@ -2,9 +2,11 @@ package logger
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"github.com/felipeversiane/donation-server/config"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -35,6 +37,11 @@ func New(config config.Log) Interface {
 	opts := &slog.HandlerOptions{
 		AddSource: true,
 		Level:     level,
+	}
+
+	dir := filepath.Dir(config.Path)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		panic(fmt.Sprintf("failed to create log directory: %v", err))
 	}
 
 	fileWriter := &lumberjack.Logger{

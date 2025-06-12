@@ -119,7 +119,8 @@ func setupRouter(httpConfig config.HTTPServer, logger logger.Interface) *gin.Eng
 		c.AbortWithStatus(500)
 	}))
 
-	router.Use(logMiddleware())
+	router.Use(contextMiddleware(logger))
+	router.Use(logMiddleware(logger))
 	router.Use(corsMiddleware())
 	router.Use(securityMiddleware(httpConfig.Environment))
 
