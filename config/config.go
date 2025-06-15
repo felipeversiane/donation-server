@@ -22,9 +22,13 @@ type Interface interface {
 }
 
 type Log struct {
-	Level  string `env:"LEVEL" envDefault:"info"`
-	Path   string `env:"PATH" envDefault:"logs/app.log"`
-	Stdout bool   `env:"STDOUT" envDefault:"true"`
+	Level      string `env:"LEVEL" envDefault:"info"`
+	Path       string `env:"PATH" envDefault:"logs/app.log"`
+	Stdout     bool   `env:"STDOUT" envDefault:"true"`
+	MaxSize    int    `env:"MAX_SIZE" envDefault:"10"`
+	MaxBackups int    `env:"MAX_BACKUPS" envDefault:"5"`
+	MaxAge     int    `env:"MAX_AGE" envDefault:"28"`
+	Compress   bool   `env:"COMPRESS" envDefault:"true"`
 }
 
 type Database struct {

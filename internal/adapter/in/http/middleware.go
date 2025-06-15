@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/unrolled/secure"
 
+	"github.com/felipeversiane/donation-server/pkg/contextkey"
 	"github.com/felipeversiane/donation-server/pkg/logger"
 )
 
@@ -46,10 +47,10 @@ func logMiddleware(log logger.Interface) gin.HandlerFunc {
 func contextMiddleware(log logger.Interface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		reqID := uuid.New().String()
-		ctx := context.WithValue(c.Request.Context(), "request_id", reqID)
+		ctx := context.WithValue(c.Request.Context(), contextkey.RequestID, reqID)
 
 		if userID := c.GetHeader("X-User-ID"); userID != "" {
-			ctx = context.WithValue(ctx, "user_id", userID)
+			ctx = context.WithValue(ctx, contextkey.UserID, userID)
 		}
 
 		c.Request = c.Request.WithContext(ctx)
