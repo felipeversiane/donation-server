@@ -1,7 +1,8 @@
 #!/bin/bash
 
-BACKUP_DIR="/backups"
-MAX_BACKUPS=7 
+BACKUP_DIR="${BACKUP_DIR:-/backups}"
+MAX_BACKUPS="${MAX_BACKUPS:-7}"
+BACKUP_LOG_FILE="${BACKUP_LOG_FILE:-$BACKUP_DIR/backup.log}"
 DATE=$(date +%Y%m%d_%H%M%S)
 TEMP_FILE="$BACKUP_DIR/temp_$DATE.sql.gz"
 BACKUP_FILE="$BACKUP_DIR/backup_$DATE.sql.gz.gpg"
@@ -14,12 +15,14 @@ fi
 cleanup() {
     ls -t $BACKUP_DIR/backup_*.sql.gz.gpg 2>/dev/null | tail -n +$((MAX_BACKUPS + 1)) | xargs rm -f 2>/dev/null
 
-    find $BACKUP_DIR -name "*.log" -mtime +30 -exec rm {} \; 2>/dev/null
+    find "$(dirname "$BACKUP_LOG_FILE")" -name "*.log" -mtime +30 -exec rm {} \; 2>/dev/null
 
     rm -f $BACKUP_DIR/temp_*.sql.gz
 }
 
 echo "[$(date)] Starting encrypted backup..."
+echo "[$(date)] Backup directory: $BACKUP_DIR"
+echo "[$(date)] Max backups to keep: $MAX_BACKUPS"
 
 if pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB" | gzip > "$TEMP_FILE" && \
    gpg --batch --yes --passphrase "$BACKUP_PASSWORD" -c "$TEMP_FILE" && \
