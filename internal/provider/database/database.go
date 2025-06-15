@@ -25,36 +25,36 @@ type Interface interface {
 }
 
 func New(config config.Database, logger logger.Interface) (Interface, error) {
-	logger.Logger().Info("initializing database connection...")
+	logger.Info("initializing database connection...")
 	dsn := getConnectionString(config)
 
 	poolConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
-		logger.Logger().Error("error parsing pool config", "error", err)
+		logger.Error("error parsing pool config", "error", err)
 		return nil, fmt.Errorf("error parsing pool config: %w", err)
 	}
 
 	maxConns, err := number.SafeIntToInt32(config.MaxConnections)
 	if err != nil {
-		logger.Logger().Error("invalid max connections", "error", err)
+		logger.Error("invalid max connections", "error", err)
 		return nil, fmt.Errorf("invalid max connections: %w", err)
 	}
 	poolConfig.MaxConns = maxConns
 
 	minConns, err := number.SafeIntToInt32(config.MinConnections)
 	if err != nil {
-		logger.Logger().Error("invalid min connections", "error", err)
+		logger.Error("invalid min connections", "error", err)
 		return nil, fmt.Errorf("invalid min connections: %w", err)
 	}
 	poolConfig.MinConns = minConns
 
 	poolConfig.MaxConnLifetime = time.Duration(config.ConnMaxLifetime) * time.Second
 
-	logger.Logger().Info("creating database connection pool...")
+	logger.Info("creating database connection pool...")
 
 	pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
 	if err != nil {
-		logger.Logger().Error("error creating connection pool", "error", err)
+		logger.Error("error creating connection pool", "error", err)
 		return nil, fmt.Errorf("error creating connection pool: %w", err)
 	}
 
@@ -64,15 +64,15 @@ func New(config config.Database, logger logger.Interface) (Interface, error) {
 		logger: logger,
 	}
 
-	logger.Logger().Info("attempting to ping database")
+	logger.Info("attempting to ping database")
 
 	if err := db.Ping(context.Background()); err != nil {
 		db.Close()
-		logger.Logger().Error("error pinging database", "error", err)
+		logger.Error("error pinging database", "error", err)
 		return nil, fmt.Errorf("error pinging database: %w", err)
 	}
 
-	logger.Logger().Info("database connection established successfully")
+	logger.Info("database connection established successfully")
 
 	return db, nil
 }
@@ -88,7 +88,7 @@ func (d *database) Ping(ctx context.Context) error {
 func (d *database) Close() {
 	if d.pool != nil {
 		d.pool.Close()
-		d.logger.Logger().Info("database connection closed")
+		d.logger.Info("database connection closed")
 	}
 }
 

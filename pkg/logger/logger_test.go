@@ -26,8 +26,8 @@ func TestLoggerInitialization(t *testing.T) {
 	}
 
 	l := loggerpkg.New(cfg)
-	l.Logger().Debug("debug message")
-	l.Logger().Error("error message")
+	l.Debug("debug message")
+	l.Error("error message")
 
 	data, err := os.ReadFile(logPath)
 	if err != nil {
@@ -38,7 +38,7 @@ func TestLoggerInitialization(t *testing.T) {
 		t.Fatalf("expected log file to contain data")
 	}
 
-	if string(data) == "" || !slogEnabled(l.Logger(), slog.LevelError) {
+	if string(data) == "" || !slogEnabled(l, slog.LevelError) {
 		t.Fatalf("logger did not log at expected level")
 	}
 
@@ -48,12 +48,12 @@ func TestLoggerInitialization(t *testing.T) {
 	}
 }
 
-func slogEnabled(l *slog.Logger, level slog.Level) bool {
+func slogEnabled(l loggerpkg.Interface, level slog.Level) bool {
 	return l.Handler().Enabled(nil, level)
 }
 
 func extractLumberjackWriter(t *testing.T, l loggerpkg.Interface) *lumberjack.Logger {
-	h := l.Logger().Handler()
+	h := l.Handler()
 	jh, ok := h.(*slog.JSONHandler)
 	if !ok {
 		t.Fatalf("unexpected handler type %T", h)
