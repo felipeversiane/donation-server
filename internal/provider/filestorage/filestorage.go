@@ -26,7 +26,7 @@ type Interface interface {
 }
 
 func New(cfg config.FileStorage, logger logger.Interface) (Interface, error) {
-	logger.Logger().Info("initializing file storage connection...")
+	logger.Info("initializing file storage connection...")
 
 	sess, err := session.NewSession(&aws.Config{
 		Region:           aws.String(cfg.Region),
@@ -35,7 +35,7 @@ func New(cfg config.FileStorage, logger logger.Interface) (Interface, error) {
 		S3ForcePathStyle: aws.Bool(true),
 	})
 	if err != nil {
-		logger.Logger().Error("unable to create S3 session", "error", err)
+		logger.Error("unable to create S3 session", "error", err)
 		return nil, fmt.Errorf("unable to create S3 session: %w", err)
 	}
 
@@ -47,7 +47,7 @@ func New(cfg config.FileStorage, logger logger.Interface) (Interface, error) {
 		logger: logger,
 	}
 
-	logger.Logger().Info("file storage initialized successfully")
+	logger.Info("file storage initialized successfully")
 
 	return fs, nil
 }
@@ -73,20 +73,20 @@ func (f *fileStorage) CreateBucket() error {
 	})
 
 	if err == nil {
-		f.logger.Logger().Info("bucket already exists", "bucket", bucket)
+		f.logger.Info("bucket already exists", "bucket", bucket)
 		return nil
 	}
 
 	if aerr, ok := err.(awserr.Error); ok && aerr.Code() == "NotFound" {
-		f.logger.Logger().Warn("bucket not found, creating", "bucket", bucket)
+		f.logger.Warn("bucket not found, creating", "bucket", bucket)
 		_, err = client.CreateBucket(&s3.CreateBucketInput{
 			Bucket: aws.String(bucket),
 		})
 		if err != nil {
-			f.logger.Logger().Error("failed to create bucket", "bucket", bucket, "error", err)
+			f.logger.Error("failed to create bucket", "bucket", bucket, "error", err)
 			return fmt.Errorf("failed to create bucket %s: %w", bucket, err)
 		}
-		f.logger.Logger().Info("bucket created successfully", "bucket", bucket)
+		f.logger.Info("bucket created successfully", "bucket", bucket)
 		return nil
 	}
 

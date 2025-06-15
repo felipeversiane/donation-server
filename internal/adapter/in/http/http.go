@@ -78,10 +78,10 @@ func (s *server) InitRoutes() {
 }
 
 func (s *server) Start() error {
-	s.logger.Logger().Info(MsgStartingHTTPServer, "port", s.config.Port)
+	s.logger.Info(MsgStartingHTTPServer, "port", s.config.Port)
 
 	if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		s.logger.Logger().Error(ErrServerFailedToStart, "error", err)
+		s.logger.Error(ErrServerFailedToStart, "error", err)
 		return err
 	}
 
@@ -89,17 +89,17 @@ func (s *server) Start() error {
 }
 
 func (s *server) Shutdown(ctx context.Context) error {
-	s.logger.Logger().Info(MsgInitiatingShutdown)
+	s.logger.Info(MsgInitiatingShutdown)
 
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	if err := s.srv.Shutdown(ctx); err != nil {
-		s.logger.Logger().Error(ErrShutdownFailed, "error", err)
+		s.logger.Error(ErrShutdownFailed, "error", err)
 		return err
 	}
 
-	s.logger.Logger().Info(MsgShutdownSuccessful)
+	s.logger.Info(MsgShutdownSuccessful)
 	return nil
 }
 
@@ -115,7 +115,7 @@ func setupRouter(httpConfig config.HTTPServer, logger logger.Interface) *gin.Eng
 	router := gin.New()
 
 	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
-		logger.Logger().Error(ErrPanicRecovered, "error", recovered)
+		logger.Error(ErrPanicRecovered, "error", recovered)
 		c.AbortWithStatus(500)
 	}))
 
