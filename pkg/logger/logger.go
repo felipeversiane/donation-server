@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/felipeversiane/donation-server/config"
+	"github.com/felipeversiane/donation-server/pkg/contextkey"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -46,10 +47,10 @@ func New(config config.Log) Interface {
 
 	fileWriter := &lumberjack.Logger{
 		Filename:   config.Path,
-		MaxSize:    10,
-		MaxBackups: 5,
-		MaxAge:     28,
-		Compress:   true,
+		MaxSize:    config.MaxSize,
+		MaxBackups: config.MaxBackups,
+		MaxAge:     config.MaxAge,
+		Compress:   config.Compress,
 	}
 
 	var output io.Writer
@@ -74,10 +75,10 @@ func (l *logger) WithContext(ctx context.Context) *slog.Logger {
 	}
 
 	fields := []any{}
-	if rid, ok := ctx.Value("request_id").(string); ok {
+	if rid, ok := ctx.Value(contextkey.RequestID).(string); ok {
 		fields = append(fields, "request_id", rid)
 	}
-	if uid, ok := ctx.Value("user_id").(string); ok {
+	if uid, ok := ctx.Value(contextkey.UserID).(string); ok {
 		fields = append(fields, "user_id", uid)
 	}
 
