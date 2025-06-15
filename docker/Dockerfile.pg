@@ -1,5 +1,10 @@
 FROM postgres:16-bullseye
 
+ENV BACKUP_DIR=/backups \
+    BACKUP_SCHEDULE="0 0 * * *" \
+    MAX_BACKUPS=7 \
+    BACKUP_LOG_FILE=/backups/backup.log
+
 RUN apt-get update && apt-get install -y \
   build-essential \
   git \
@@ -10,15 +15,15 @@ RUN apt-get update && apt-get install -y \
   && git clone --branch v0.6.0 https://github.com/pgvector/pgvector.git \
   && cd pgvector && make && make install \
   && rm -rf /pgvector \
-  && mkdir -p /backups \
-  && chown -R postgres:postgres /backups
+  && mkdir -p ${BACKUP_DIR} \
+  && chown -R postgres:postgres ${BACKUP_DIR}
 
 RUN echo 'CREATE EXTENSION IF NOT EXISTS vector;' > /docker-entrypoint-initdb.d/init.sql
 
 COPY docker/backup.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/backup.sh
 
-RUN echo "0 0 * * * postgres BACKUP_PASSWORD=\${BACKUP_PASSWORD} /usr/local/bin/backup.sh >> /backups/backup.log 2>&1" > /etc/cron.d/postgres-backup \
+RUN echo "${BACKUP_SCHEDULE} postgres BACKUP_PASSWORD=\${BACKUP_PASSWORD} BACKUP_DIR=\${BACKUP_DIR} MAX_BACKUPS=\${MAX_BACKUPS} BACKUP_LOG_FILE=\${BACKUP_LOG_FILE} /usr/local/bin/backup.sh >> \${BACKUP_LOG_FILE} 2>&1" > /etc/cron.d/postgres-backup \
   && chmod 0644 /etc/cron.d/postgres-backup
 
 RUN echo '#!/bin/bash\nservice cron start\nexec docker-entrypoint.sh "$@"' > /docker-entrypoint.sh \

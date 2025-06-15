@@ -2,10 +2,13 @@ name: donation-server
 
 services:
   db:
-    image: postgres:16-alpine
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.pg
     container_name: donation-server-db
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
     ports:
       - "5432:5432"
     environment:
@@ -13,6 +16,10 @@ services:
       POSTGRES_PASSWORD: postgres123
       POSTGRES_DB: postgres
       POSTGRES_SSL: disable
+      BACKUP_PASSWORD: changeit
+      BACKUP_DIR: /backups
+      MAX_BACKUPS: 7
+      BACKUP_SCHEDULE: "0 0 * * *"
     networks:
       - default
     healthcheck:
