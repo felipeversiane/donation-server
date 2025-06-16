@@ -25,7 +25,10 @@ func TestLoggerInitialization(t *testing.T) {
 		Compress:   false,
 	}
 
-	l := loggerpkg.New(cfg)
+	l, err := loggerpkg.New(cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	l.Debug("debug message")
 	l.Error("error message")
 

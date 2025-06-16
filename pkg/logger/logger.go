@@ -33,7 +33,7 @@ type Interface interface {
 	Logger() *slog.Logger
 }
 
-func New(config config.Log) Interface {
+func New(config config.Log) (Interface, error) {
 	var level slog.Level
 	switch config.Level {
 	case "debug":
@@ -53,7 +53,7 @@ func New(config config.Log) Interface {
 
 	dir := filepath.Dir(config.Path)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
-		panic(fmt.Sprintf("failed to create log directory: %v", err))
+		return nil, fmt.Errorf("failed to create log directory: %w", err)
 	}
 
 	fileWriter := &lumberjack.Logger{
@@ -71,13 +71,10 @@ func New(config config.Log) Interface {
 		output = fileWriter
 	}
 
-	var handler slog.Handler
-
-	handler = slog.NewJSONHandler(output, opts)
-
+	handler := slog.NewJSONHandler(output, opts)
 	s := slog.New(handler)
 
-	return &logger{slog: s}
+	return &logger{slog: s}, nil
 }
 
 func (l *logger) WithContext(ctx context.Context) Interface {
