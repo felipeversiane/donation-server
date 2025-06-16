@@ -1,4 +1,4 @@
-package logger_test
+package logger
 
 import (
 	"log/slog"
@@ -7,8 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/felipeversiane/donation-server/config"
-	loggerpkg "github.com/felipeversiane/donation-server/pkg/logger"
+	"github.com/felipeversiane/donation-server/config"	
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -25,7 +24,7 @@ func TestLoggerInitialization(t *testing.T) {
 		Compress:   false,
 	}
 
-	l, err := loggerpkg.New(cfg)
+	l, err := New(cfg)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -51,11 +50,11 @@ func TestLoggerInitialization(t *testing.T) {
 	}
 }
 
-func slogEnabled(l loggerpkg.Interface, level slog.Level) bool {
+func slogEnabled(l Interface, level slog.Level) bool {
 	return l.Handler().Enabled(nil, level)
 }
 
-func extractLumberjackWriter(t *testing.T, l loggerpkg.Interface) *lumberjack.Logger {
+func extractLumberjackWriter(t *testing.T, l Interface) *lumberjack.Logger {
 	h := l.Handler()
 	jh, ok := h.(*slog.JSONHandler)
 	if !ok {
