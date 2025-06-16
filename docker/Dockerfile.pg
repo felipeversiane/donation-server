@@ -23,11 +23,9 @@ RUN echo 'CREATE EXTENSION IF NOT EXISTS vector;' > /docker-entrypoint-initdb.d/
 COPY docker/backup.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/backup.sh
 
-RUN echo "${BACKUP_SCHEDULE} postgres BACKUP_PASSWORD=\${BACKUP_PASSWORD} BACKUP_DIR=\${BACKUP_DIR} MAX_BACKUPS=\${MAX_BACKUPS} BACKUP_LOG_FILE=\${BACKUP_LOG_FILE} /usr/local/bin/backup.sh >> \${BACKUP_LOG_FILE} 2>&1" > /etc/cron.d/postgres-backup \
-  && chmod 0644 /etc/cron.d/postgres-backup
+COPY docker/postgres-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/postgres-entrypoint.sh
 
-RUN echo '#!/bin/bash\nservice cron start\nexec docker-entrypoint.sh "$@"' > /docker-entrypoint.sh \
-  && chmod +x /docker-entrypoint.sh
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["postgres"] 
+USER root
+ENTRYPOINT ["/usr/local/bin/postgres-entrypoint.sh"]
+CMD ["postgres"]
