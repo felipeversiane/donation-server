@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 BACKUP_DIR="${BACKUP_DIR:-/backups}"
 MAX_BACKUPS="${MAX_BACKUPS:-7}"
