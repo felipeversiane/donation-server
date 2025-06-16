@@ -6,6 +6,10 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"os"
+
 	"github.com/felipeversiane/donation-server/config"
 	"github.com/felipeversiane/donation-server/internal/adapter/in/http"
 	"github.com/felipeversiane/donation-server/internal/provider/database"
@@ -23,5 +27,14 @@ func main() {
 		fx.NopLogger,
 	)
 
-	app.Run()
+	ctx := context.Background()
+	if err := app.Start(ctx); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to start application: %v\n", err)
+		os.Exit(1)
+	}
+	<-app.Done()
+	if err := app.Stop(ctx); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to stop application: %v\n", err)
+		os.Exit(1)
+	}
 }
