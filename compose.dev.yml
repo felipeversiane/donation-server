@@ -2,29 +2,20 @@ name: donation-server
 
 services:
   db:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.pg
-    env_file: .env
+    image: postgres:16
     container_name: donation-server-db
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
-      - ./backups:/backups
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "${DB_PORT}:5432"
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_SSL=${DB_SSL}
-      - BACKUP_PASSWORD=${BACKUP_PASSWORD}
-      - BACKUP_DIR=${BACKUP_DIR}
-      - MAX_BACKUPS=${MAX_BACKUPS}
-      - BACKUP_SCHEDULE=${BACKUP_SCHEDULE}
     networks:
       - default
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -q -d ${DB_NAME} -U ${DB_USER} || exit 1"]
+      test: ["CMD-SHELL", "pg_isready -q -d ${DB_NAME} -U ${DB_USER} -p 5432 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3  
