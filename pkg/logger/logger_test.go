@@ -1,13 +1,14 @@
 package logger
 
 import (
+	"context"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
 
-	"github.com/felipeversiane/donation-server/config"	
+	"github.com/felipeversiane/donation-server/config"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -36,22 +37,32 @@ func TestLoggerInitialization(t *testing.T) {
 		t.Fatalf("failed to read log file: %v", err)
 	}
 
-	if !reflect.DeepEqual(true, len(data) > 0) {
+	if len(data) == 0 {
 		t.Fatalf("expected log file to contain data")
 	}
 
-	if string(data) == "" || !slogEnabled(l, slog.LevelError) {
+	if string(data) == "" {
+		t.Fatalf("logger did not write to file")
+	}
+	if !slogEnabled(l, slog.LevelError) {
 		t.Fatalf("logger did not log at expected level")
 	}
 
 	lj := extractLumberjackWriter(t, l)
-	if lj.Filename != logPath || lj.MaxSize != cfg.MaxSize || lj.MaxBackups != cfg.MaxBackups || lj.MaxAge != cfg.MaxAge || lj.Compress != cfg.Compress {
+	expected := lumberjack.Logger{
+		Filename:   logPath,
+		MaxSize:    cfg.MaxSize,
+		MaxBackups: cfg.MaxBackups,
+		MaxAge:     cfg.MaxAge,
+		Compress:   cfg.Compress,
+	}
+	if !reflect.DeepEqual(*lj, expected) {
 		t.Fatalf("lumberjack config mismatch")
 	}
 }
 
 func slogEnabled(l Interface, level slog.Level) bool {
-	return l.Handler().Enabled(nil, level)
+	return l.Handler().Enabled(context.TODO(), level)
 }
 
 func extractLumberjackWriter(t *testing.T, l Interface) *lumberjack.Logger {

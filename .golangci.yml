@@ -1,3 +1,4 @@
+version: "2"
 run:
   timeout: 3m
   tests: true
@@ -17,9 +18,6 @@ linters:
     - exhaustive
     - forcetypeassert
     - funlen
-    - gofmt
-    - goimports
-    - gosimple
     - govet
     - gosec
     - ineffassign
@@ -35,10 +33,14 @@ linters:
     - revive
     - rowserrcheck
     - staticcheck
-    - typecheck
     - unconvert
     - unparam
     - unused
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
 
 linters-settings:
   goimports:
