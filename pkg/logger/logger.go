@@ -7,6 +7,8 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"runtime"
+	"time"
 
 	"github.com/felipeversiane/donation-server/config"
 	"github.com/felipeversiane/donation-server/pkg/contextkey"
@@ -16,6 +18,11 @@ import (
 type logger struct {
 	slog *slog.Logger
 }
+
+// callDepth is the number of stack frames to skip to determine the log
+// call site. It skips runtime.Callers, the internal log method, and the
+// exported log method (e.g. Info).
+const callDepth = 3
 
 // Interface exposes common logging capabilities in a form similar to slog.Logger
 // while also allowing log enrichment with request scoped values.
@@ -97,20 +104,37 @@ func (l *logger) Logger() *slog.Logger {
 	return l.slog
 }
 
+func (l *logger) log(ctx context.Context, level slog.Level, msg string, args ...any) {
+	if !l.slog.Handler().Enabled(ctx, level) {
+		return
+	}
+
+	var pcs [1]uintptr
+	runtime.Callers(callDepth, pcs[:])
+
+	r := slog.NewRecord(time.Now(), level, msg, pcs[0])
+	r.Add(args...)
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	_ = l.slog.Handler().Handle(ctx, r)
+}
+
 func (l *logger) Debug(msg string, args ...any) {
-	l.slog.Debug(msg, args...)
+	l.log(context.Background(), slog.LevelDebug, msg, args...)
 }
 
 func (l *logger) Info(msg string, args ...any) {
-	l.slog.Info(msg, args...)
+	l.log(context.Background(), slog.LevelInfo, msg, args...)
 }
 
 func (l *logger) Warn(msg string, args ...any) {
-	l.slog.Warn(msg, args...)
+	l.log(context.Background(), slog.LevelWarn, msg, args...)
 }
 
 func (l *logger) Error(msg string, args ...any) {
-	l.slog.Error(msg, args...)
+	l.log(context.Background(), slog.LevelError, msg, args...)
 }
 
 func (l *logger) With(args ...any) Interface {
