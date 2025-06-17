@@ -1,6 +1,7 @@
 package filestorage
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -77,7 +78,8 @@ func (f *fileStorage) CreateBucket() error {
 		return nil
 	}
 
-	if aerr, ok := err.(awserr.Error); ok && aerr.Code() == "NotFound" {
+	var aerr awserr.Error
+	if errors.As(err, &aerr) && aerr.Code() == "NotFound" {
 		f.logger.Warn("bucket not found, creating", "bucket", bucket)
 		_, err = client.CreateBucket(&s3.CreateBucketInput{
 			Bucket: aws.String(bucket),
