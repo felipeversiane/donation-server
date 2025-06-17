@@ -18,13 +18,8 @@ type logger struct {
 	slog *slog.Logger
 }
 
-// callDepth is the number of stack frames to skip to determine the log
-// call site. It skips runtime.Callers, the internal log method, and the
-// exported log method (e.g. Info).
 const callDepth = 3
 
-// Interface exposes common logging capabilities in a form similar to slog.Logger
-// while also allowing log enrichment with request scoped values.
 type Interface interface {
 	Debug(msg string, args ...any)
 	Info(msg string, args ...any)
@@ -35,7 +30,6 @@ type Interface interface {
 	Handler() slog.Handler
 	WithContext(ctx context.Context) Interface
 
-	// Logger returns the underlying slog.Logger for advanced use cases.
 	Logger() *slog.Logger
 }
 
