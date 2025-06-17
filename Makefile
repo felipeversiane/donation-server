@@ -39,5 +39,5 @@ setup:
 	@git config core.hooksPath .githooks
 
 test:
-        go test ./... -v
+	go test ./... -v
 
