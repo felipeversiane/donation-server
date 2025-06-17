@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/felipeversiane/donation-server/config"
-	"github.com/felipeversiane/donation-server/pkg/contextkey"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -90,10 +89,10 @@ func (l *logger) WithContext(ctx context.Context) Interface {
 	}
 
 	fields := []any{}
-	if rid, ok := ctx.Value(contextkey.RequestID).(string); ok {
+	if rid, ok := RequestIDFromContext(ctx); ok {
 		fields = append(fields, "request_id", rid)
 	}
-	if uid, ok := ctx.Value(contextkey.UserID).(string); ok {
+	if uid, ok := UserIDFromContext(ctx); ok {
 		fields = append(fields, "user_id", uid)
 	}
 
